@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grwo | Executive Dashboard</title>
+    
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- SHARED LUXURY THEME (Unified Brand Identity) --- */
+        :root {
+            --primary: #1a1a1a;
+            --gold: #d4af37;
+            --bg: #f8f9fa;
+            --glass: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            overflow-x: hidden;
+        }
+
+        .brand-font { font-family: 'Playfair Display', serif; }
+        .text-gold { color: var(--gold) !important; }
+        .bg-gold { background-color: var(--gold) !important; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px; background: #fff; border-right: 1px solid #eee;
+            padding: 30px; position: fixed; height: 100vh; z-index: 100;
+        }
+
+        .nav-link {
+            color: #666; font-weight: 500; padding: 12px 20px;
+            border-radius: 12px; margin-bottom: 5px; display: flex; align-items: center; gap: 12px;
+            transition: 0.3s;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary); color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .nav-link.active i { color: var(--gold); }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 280px; width: calc(100% - 280px); padding: 40px;
+        }
+
+        /* CARDS */
+        .stat-card {
+            background: #fff; border-radius: 20px; padding: 25px;
+            border: 1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            transition: 0.3s;
+        }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+        .stat-value { font-size: 2rem; font-weight: 700; font-family: 'Playfair Display'; }
+
+        .glass-panel {
+            background: #fff; border-radius: 24px; padding: 25px;
+            border: 1px solid #eee; box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
+
+        /* BUTTONS */
+        .btn-premium {
+            background: var(--primary); color: #fff; border-radius: 50px; padding: 8px 25px; border: none;
+        }
+        .btn-premium:hover { background: var(--gold); color: #fff; }
+
+        /* TABLES */
+        .table-hover tbody tr:hover { background-color: rgba(212, 175, 55, 0.05); }
+        .property-thumb { width: 60px; height: 60px; border-radius: 12px; object-fit: cover; }
+        
+        /* MODAL */
+        .modal-content { border-radius: 20px; border: none; }
+        .modal-header { border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar d-flex flex-column">
+        <a href="dashboard.html" class="d-flex align-items-center mb-4 text-decoration-none text-dark">
+            <span class="fs-3 fw-bold brand-font">Grwo<span class="text-gold">.</span></span>
+        </a>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li><a href="dashboard.html" class="nav-link active"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+            <li><a href="properties.html" class="nav-link"><i class="fa-solid fa-building"></i> Properties</a></li>
+            <li><a href="customers.html" class="nav-link"><i class="fa-solid fa-users"></i> Customers</a></li>
+            <li><a href="calender_tasks.html" class="nav-link"><i class="fa-regular fa-calendar-check"></i> Calendar</a></li>
+            <li><a href="reach.html" class="nav-link"><i class="fa-solid fa-paper-plane"></i> Reach</a></li>
+            <li><a href="customerdirectory.html" class="nav-link"><i class="fa-solid fa-address-book"></i> Customer Directory</a></li>
+            <li><a href="analytics.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics</a></li>
+            <li><a href="grwoai.html" class="nav-link"><i class="fa-solid fa-brain"></i> GrwoAI</a></li>
+            <li><a href="index.html" class="nav-link mt-5 text-danger" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+        </ul>
+        <div class="mt-auto">
+            <div class="p-3 bg-light rounded-4 border text-center">
+                <small class="text-muted d-block text-uppercase" style="font-size:0.7rem;">Logged in as</small>
+                <strong class="text-gold" id="sidebarUserFirm">User <span class="text-dark">|</span> Firm</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div id="content-area">
+            <!-- Content loads here via JS -->
+            <div class="d-flex justify-content-center align-items-center" style="height: 80vh;">
+                <div class="spinner-border text-warning" role="status"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD PROPERTY MODAL -->
+    <div class="modal fade" id="addPropModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-3">
+                <div class="modal-header">
+                    <h5 class="modal-title brand-font">Add Exclusive Asset</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="propForm" onsubmit="handleAddProperty(event)">
+                        <div class="mb-3"><input type="text" class="form-control" name="title" placeholder="Property Title" required></div>
+                        <div class="row mb-3">
+                            <div class="col"><select class="form-select" name="type"><option>Apartment</option><option>Commercial</option><option>Villa</option></select></div>
+                            <div class="col"><select class="form-select" name="status"><option>Sale</option><option>Rent</option><option>Lease</option></select></div>
+                        </div>
+                        <div class="mb-3"><input type="number" class="form-control" name="price" placeholder="Price (INR)" required></div>
+                        <div class="mb-3"><input type="text" class="form-control" name="location" placeholder="Location" required></div>
+                        <button type="submit" class="btn btn-premium w-100">List Property</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const sidebarUserFirm = document.getElementById('sidebarUserFirm');
+                let user = null;
+                try { user = JSON.parse(localStorage.getItem('user')); } catch {}
+                if(user && user.firmName){
+                    const nameToShow = user.fullName || user.email || 'User';
+                    sidebarUserFirm.innerHTML = `${nameToShow} <span class='text-dark'>|</span> ${user.firmName}`;
+                }
+            });
+        </script>
+
+    <script>
+        // --- CONFIG & UTILS ---
+        const API_URL = 'http://localhost:3000/api';
+        
+        const formatINR = (amount) => {
+            return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumSignificantDigits: 3 }).format(amount);
+        };
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTab('overview'); // Default load
+        });
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
+        // --- ROUTER / TAB SWITCHER ---
+        async function loadTab(tabName, evt) {
+            // UI Updates (safe if evt undefined)
+            document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('active'));
+            if(evt && evt.target){ evt.target.closest('.nav-link')?.classList.add('active'); }
+            else {
+                // Mark dashboard link active when first load
+                if(tabName === 'overview') document.querySelector('a[href="dashboard.html"]')?.classList.add('active');
+            }
+
+            const content = document.getElementById('content-area');
+            gsap.to(content, { opacity: 0, duration: 0.15 });
+            setTimeout(async () => {
+                try {
+                    if(tabName === 'overview') await renderOverview(content);
+                    else if(tabName === 'properties') await renderProperties(content);
+                    else if(tabName === 'leads') await renderLeads(content);
+                } catch(e){
+                    content.innerHTML = `<div class='alert alert-danger'>Dashboard load failed: ${e.message}</div>`;
+                } finally {
+                    gsap.to(content, { opacity: 1, duration: 0.25 });
+                }
+            }, 160);
+        }
+
+        // --- VIEW: OVERVIEW ---
+        async function renderOverview(container) {
+            // Fetch live data in parallel
+            const [propRes, custRes, taskRes] = await Promise.all([
+                fetch(`${API_URL}/properties`),
+                fetch(`${API_URL}/customers`),
+                fetch(`${API_URL}/tasks`)
+            ]);
+            const properties = await propRes.json();
+            const customers = await custRes.json();
+            const taskJson = await taskRes.json();
+            const tasks = taskJson.success ? taskJson.data : [];
+
+            // Metrics
+            const inventoryValue = properties.reduce((sum,p)=> sum + (Number(p.price)||0),0);
+            const activeLeads = customers.filter(c=> c.status !== 'Closed').length;
+            const propertiesListed = properties.length;
+            const todayStr = new Date().toDateString();
+            const pendingTasks = tasks.filter(t => new Date(t.date) >= new Date() ).length;
+            const todaysTasks = tasks.filter(t => new Date(t.date).toDateString() === todayStr);
+
+            container.innerHTML = `
+                <h2 class="brand-font mb-4">Executive Overview</h2>
+                <div class="row g-4 mb-5">
+                    <div class="col-md-3"><div class="stat-card"><p class="text-muted mb-1">Inventory Value</p><div class="stat-value">${formatINR(inventoryValue)}</div><small class="text-success"><i class="fa-solid fa-arrow-trend-up"></i> Live</small></div></div>
+                    <div class="col-md-3"><div class="stat-card"><p class="text-muted mb-1">Active Leads</p><div class="stat-value">${activeLeads}</div><small class="text-gold">Pipeline</small></div></div>
+                    <div class="col-md-3"><div class="stat-card"><p class="text-muted mb-1">Properties Listed</p><div class="stat-value">${propertiesListed}</div><small class="text-muted">Catalog</small></div></div>
+                    <div class="col-md-3"><div class="stat-card"><p class="text-muted mb-1">Upcoming Tasks</p><div class="stat-value">${pendingTasks}</div><small class="text-danger">Attention</small></div></div>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-8">
+                        <div class="glass-panel h-100">
+                            <h5 class="mb-4">Revenue Projection</h5>
+                            <canvas id="chartRevenue"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-panel h-100">
+                            <h5 class="mb-4">Today's Tasks</h5>
+                            ${todaysTasks.length? todaysTasks.map(t=>`<div class='d-flex align-items-center p-3 mb-2 border rounded bg-light'>
+                                <div class='bg-dark text-white rounded-circle p-2 me-3'><i class='fa-solid fa-calendar-day'></i></div>
+                                <div><h6 class='mb-0'>${t.title}</h6><small class='text-muted'>${new Date(t.date).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} • ${t.type||'Task'}</small></div>
+                            </div>`).join('') : `<p class='text-muted small mb-0'>No tasks scheduled for today.</p>`}
+                        </div>
+                    </div>
+                </div>
+            `;
+            buildRevenueChart(properties);
+        }
+
+        // --- VIEW: PROPERTIES ---
+        async function renderProperties(container) {
+            const res = await fetch(`${API_URL}/properties`);
+            const props = await res.json();
+            let rows = props.map(p => {
+                const img = (p.images && p.images.length)? p.images[0] : 'https://via.placeholder.com/60x60?text=IMG';
+                const statusClass = p.status==='Sale'? 'bg-success' : 'bg-secondary';
+                return `<tr>
+                    <td class='p-3'>
+                        <div class='d-flex align-items-center'>
+                            <img src='${img}' class='property-thumb me-3' alt='img'>
+                            <div><h6 class='mb-0 fw-bold'>${p.title}</h6><small class='text-muted'><i class='fa-solid fa-location-dot'></i> ${p.location}</small></div>
+                        </div>
+                    </td>
+                    <td><span class='badge bg-light text-dark border'>${p.type}</span></td>
+                    <td><span class='badge ${statusClass}'>${p.status}</span></td>
+                    <td class='fw-bold'>${formatINR(p.price)}</td>
+                    <td><button class='btn btn-sm btn-outline-danger' onclick="deleteProperty('${p._id}')"><i class='fa-solid fa-trash'></i></button></td>
+                </tr>`;
+            }).join('');
+            container.innerHTML = `
+                <div class='d-flex justify-content-between align-items-center mb-4'>
+                    <h2 class='brand-font'>Property Command</h2>
+                    <button class='btn btn-premium' data-bs-toggle='modal' data-bs-target='#addPropModal'>+ Add Asset</button>
+                </div>
+                <div class='glass-panel p-0 overflow-hidden'>
+                    <table class='table table-hover mb-0 align-middle'>
+                        <thead class='bg-light'><tr><th class='p-3'>Asset</th><th>Type</th><th>Status</th><th>Valuation</th><th>Actions</th></tr></thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>`;
+        }
+
+        // --- VIEW: LEADS ---
+        async function renderLeads(container) {
+            const res = await fetch(`${API_URL}/customers`);
+            const all = await res.json();
+            const leads = all.filter(c => c.status !== 'Closed');
+            const cards = leads.map(l => {
+                const initials = (l.name||'').split(' ').map(p=>p[0]).join('').substring(0,2).toUpperCase() || 'CL';
+                return `<div class='col-md-4'>
+                    <div class='glass-panel position-relative'>
+                        <span class='badge bg-gold position-absolute top-0 end-0 m-3'>${l.status}</span>
+                        <div class='d-flex align-items-center gap-3 mb-2'>
+                            <div class='bg-dark text-white rounded-circle d-flex align-items-center justify-content-center' style='width:50px;height:50px;font-weight:600;'>${initials}</div>
+                            <div><h5 class='fw-bold mb-0'>${l.name}</h5><small class='text-muted'>ID ${l.custId}</small></div>
+                        </div>
+                        <p class='text-muted mb-1'><i class='fa-solid fa-phone'></i> ${l.phone}</p>
+                        ${l.email? `<p class='text-muted mb-1'><i class='fa-solid fa-envelope'></i> ${l.email}</p>`:''}
+                        <hr>
+                        <div class='d-flex justify-content-between mb-2'><small class='text-muted'>Req</small><strong>${l.req||'—'}</strong></div>
+                        <div class='d-flex justify-content-between'><small class='text-muted'>Budget</small><strong>${formatINR(l.budget||0)}</strong></div>
+                    </div>
+                </div>`;
+            }).join('');
+            container.innerHTML = `
+                <div class='d-flex justify-content-between align-items-center mb-4'>
+                    <h2 class='brand-font'>Client Intelligence</h2>
+                    <button class='btn btn-dark rounded-pill' onclick='addLeadPrompt()'>+ Add Lead</button>
+                </div>
+                <div class='row g-4'>${cards||"<p class='text-muted'>No active leads.</p>"}</div>`;
+        }
+
+        // --- ACTIONS ---
+        async function handleAddProperty(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            await fetch(`${API_URL}/properties`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            
+            // Close Modal & Reload
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addPropModal'));
+            modal.hide();
+            loadTab('properties');
+            e.target.reset();
+        }
+
+        async function deleteProperty(id) {
+            if(confirm('Delete this asset?')) {
+                await fetch(`${API_URL}/properties/${id}`, { method: 'DELETE' });
+                loadTab('properties');
+            }
+        }
+
+        async function addLeadPrompt() {
+            // Simple prompt for MVP
+            const name = prompt("Client Name:");
+            if(!name) return;
+            const budget = prompt("Budget (Number):");
+            
+            await fetch(`${API_URL}/leads`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ name, phone: 'Pending', req: 'General', budget: budget || 0 })
+            });
+            loadTab('leads');
+        }
+
+        function buildRevenueChart(properties){
+            const ctx = document.getElementById('chartRevenue');
+            if(!ctx) return;
+            // Aggregate last 6 months revenue from closedDate (fallback createdAt)
+            const map = new Map();
+            for(let i=5;i>=0;i--){
+                const d = new Date(); d.setMonth(d.getMonth()-i);
+                const key = d.getFullYear()+ '-' + String(d.getMonth()+1).padStart(2,'0');
+                const label = d.toLocaleString('en-US',{month:'short'});
+                map.set(key,{ label, total:0 });
+            }
+            properties.forEach(p => {
+                const date = p.closedDate || p.createdAt; if(!date) return;
+                const d = new Date(date);
+                const key = d.getFullYear()+ '-' + String(d.getMonth()+1).padStart(2,'0');
+                if(map.has(key)) map.get(key).total += (Number(p.price)||0);
+            });
+            const labels = Array.from(map.values()).map(v=>v.label);
+            const dataVals = Array.from(map.values()).map(v=> +(v.total/10000000).toFixed(2)); // in Cr
+            new Chart(ctx, {
+                type:'line',
+                data:{ labels, datasets:[{ label:'Revenue (Cr)', data:dataVals, borderColor:'#d4af37', backgroundColor:'rgba(212,175,55,0.15)', fill:true, tension:0.4 }] },
+                options:{ responsive:true, plugins:{ legend:{ display:false } }, scales:{ y:{ beginAtZero:true } } }
+            });
+        }
+    </script>
+</body>
+</html>

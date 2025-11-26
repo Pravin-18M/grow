@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grwo | Master Directory</title>
+    
+    <!-- External Resources -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ----------------------------------------------------------------
+           THEME VARIABLES
+        ---------------------------------------------------------------- */
+        :root {
+            --primary: #1a1a1a;
+            --gold: #d4af37;
+            --bg: #f8f9fa;
+            --glass: rgba(255, 255, 255, 0.95);
+            --border: #eaeaea;
+            --transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0; overflow-x: hidden;
+        }
+
+        .brand-font { font-family: 'Playfair Display', serif; }
+        .text-gold { color: var(--gold) !important; }
+        .bg-gold { background-color: var(--gold) !important; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px; background: #fff; border-right: 1px solid #eee;
+            padding: 30px; position: fixed; height: 100vh; z-index: 100;
+            display: flex; flex-direction: column;
+        }
+        .nav-link {
+            color: #666; font-weight: 500; padding: 12px 20px;
+            border-radius: 12px; margin-bottom: 5px; display: flex; align-items: center; gap: 12px;
+            transition: var(--transition); text-decoration: none;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary); color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .nav-link.active i { color: var(--gold); }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 280px; width: calc(100% - 280px); padding: 40px; min-height: 100vh;
+        }
+
+        /* --- DIRECTORY LIST (LEFT PANE) --- */
+        .directory-list {
+            background: #fff; border-radius: 20px; border: 1px solid var(--border);
+            height: 80vh; overflow-y: auto; overflow-x: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+        }
+        
+        .customer-item {
+            padding: 20px; border-bottom: 1px solid #f5f5f5; cursor: pointer;
+            transition: var(--transition); position: relative;
+        }
+        .customer-item:hover { background: #fafafa; }
+        .customer-item.active { background: #fffbf0; border-left: 4px solid var(--gold); }
+        
+        .avatar-small {
+            width: 45px; height: 45px; border-radius: 50%; background: #333; color: #fff;
+            display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;
+        }
+
+        /* --- DOSSIER (RIGHT PANE) --- */
+        .dossier-panel {
+            background: #fff; border-radius: 24px; border: 1px solid var(--border);
+            min-height: 80vh; padding: 40px; box-shadow: 0 20px 60px rgba(0,0,0,0.05);
+            display: none; /* Hidden initially */
+        }
+        
+        .dossier-header { border-bottom: 1px solid #eee; padding-bottom: 30px; margin-bottom: 30px; }
+        
+        .tag-pill {
+            font-size: 0.7rem; text-transform: uppercase; padding: 5px 12px;
+            border-radius: 20px; font-weight: 600; letter-spacing: 0.5px;
+        }
+        .tag-vip { background: #000; color: #d4af37; border: 1px solid #d4af37; }
+        .tag-hni { background: #eef2ff; color: #4338ca; }
+        .tag-investor { background: #ecfdf5; color: #047857; }
+
+        /* ASSET CARDS */
+        .asset-card {
+            border: 1px solid #eee; border-radius: 12px; padding: 15px; margin-bottom: 15px;
+            display: flex; gap: 15px; align-items: center; transition: 0.3s;
+        }
+        .asset-card:hover { border-color: var(--gold); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .asset-thumb { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; }
+
+        /* THE HOROSCOPE TIMELINE */
+        .timeline { position: relative; padding-left: 30px; margin-top: 20px; }
+        .timeline::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+            width: 2px; background: #f0f0f0;
+        }
+        .timeline-event { position: relative; margin-bottom: 30px; }
+        .timeline-dot {
+            position: absolute; left: -35px; top: 0; width: 12px; height: 12px;
+            border-radius: 50%; background: #fff; border: 2px solid var(--gold); z-index: 2;
+        }
+        .timeline-date { font-size: 0.75rem; color: #999; margin-bottom: 4px; text-transform: uppercase; }
+        .timeline-content {
+            background: #f9f9f9; padding: 15px; border-radius: 12px;
+            font-size: 0.9rem; border-left: 3px solid transparent;
+        }
+        .timeline-event.deal .timeline-content { border-left-color: #059669; background: #ecfdf5; }
+        .timeline-event.visit .timeline-content { border-left-color: var(--gold); background: #fffbf0; }
+
+        /* EMPTY STATE */
+        .empty-state {
+            height: 80vh; display: flex; align-items: center; justify-content: center;
+            flex-direction: column; color: #ccc;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR (Unified Across App) -->
+    <div class="sidebar d-flex flex-column">
+        <a href="dashboard.html" class="d-flex align-items-center mb-4 text-decoration-none text-dark">
+            <span class="fs-3 fw-bold brand-font">Grwo<span class="text-gold">.</span></span>
+        </a>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li><a href="dashboard.html" class="nav-link"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+            <li><a href="properties.html" class="nav-link"><i class="fa-solid fa-building"></i> Properties</a></li>
+            <li><a href="customers.html" class="nav-link"><i class="fa-solid fa-users"></i> Customers</a></li>
+            <li><a href="calender_tasks.html" class="nav-link"><i class="fa-regular fa-calendar-check"></i> Calendar</a></li>
+            <li><a href="reach.html" class="nav-link"><i class="fa-solid fa-paper-plane"></i> Reach</a></li>
+            <li><a href="customerdirectory.html" class="nav-link active"><i class="fa-solid fa-address-book"></i> Customer Directory</a></li>
+            <li><a href="analytics.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics</a></li>
+            <li><a href="grwoai.html" class="nav-link"><i class="fa-solid fa-brain"></i> GrwoAI</a></li>
+            <li><a href="index.html" class="nav-link mt-5 text-danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+        </ul>
+        <div class="mt-auto">
+            <div class="p-3 bg-light rounded-4 border text-center">
+                <small class="text-muted d-block text-uppercase" style="font-size:0.7rem;">Logged in as</small>
+                <strong class="text-gold" id="sidebarUserFirm">User <span class="text-dark">|</span> Firm</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h6 class="text-gold text-uppercase letter-spacing-2 mb-1">Central Database</h6>
+                <h2 class="brand-font display-6 fw-bold">Master Directory</h2>
+            </div>
+            <button class="btn btn-outline-dark rounded-pill px-4"><i class="fa-solid fa-download me-2"></i> Export Data</button>
+        </div>
+
+        <div class="row g-4">
+            <!-- LEFT PANE: SEARCHABLE LIST -->
+            <div class="col-lg-4">
+                <div class="input-group mb-3">
+                    <span class="input-group-text bg-white border-end-0"><i class="fa-solid fa-magnifying-glass text-muted"></i></span>
+                    <input type="text" class="form-control border-start-0 py-3" id="searchInput" placeholder="Search by name, ID or phone..." onkeyup="filterList()">
+                </div>
+                
+                <div class="d-flex gap-2 mb-3 overflow-auto pb-2">
+                    <button class="btn btn-sm btn-dark rounded-pill px-3">All</button>
+                    <button class="btn btn-sm btn-light border rounded-pill px-3">Closed Deals</button>
+                    <button class="btn btn-sm btn-light border rounded-pill px-3">Investors</button>
+                </div>
+
+                <div class="directory-list" id="customerList">
+                    <!-- List items generated by JS -->
+                </div>
+            </div>
+
+            <!-- RIGHT PANE: DOSSIER -->
+            <div class="col-lg-8">
+                <!-- Empty State -->
+                <div id="emptyState" class="empty-state">
+                    <i class="fa-regular fa-id-card fa-4x mb-3"></i>
+                    <h5>Select a Profile</h5>
+                    <p>Click on a customer to view their complete history.</p>
+                </div>
+
+                <!-- Detailed Dossier -->
+                <div id="dossierPanel" class="dossier-panel">
+                    <!-- Dynamic Content -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+        <!-- REOPEN CUSTOMER MODAL -->
+        <div class="modal fade" id="reopenCustomerModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header p-4">
+                        <div>
+                            <h5 class="modal-title fw-bold mb-1"><i class="fa-solid fa-rotate-left text-warning me-2"></i>Reopen Customer</h5>
+                            <p class="text-muted small mb-0" id="reopenCustomerName">Provide new requirement & stage</p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form id="reopenCustomerForm" onsubmit="handleReopenCustomer(event)">
+                        <div class="modal-body p-4 pt-0">
+                            <input type="hidden" name="custId" id="reopenCustId" />
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" name="newReq" placeholder="New Requirement" required>
+                                <label>New Requirement *</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <select class="form-select" name="newStatus" required>
+                                    <option value="Interested">Interested</option>
+                                    <option value="New">New Lead</option>
+                                    <option value="Interested-High">Interested High Intent</option>
+                                </select>
+                                <label>New Status *</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <textarea class="form-control" name="context" style="height:100px" placeholder="Context / Notes"></textarea>
+                                <label>Context / Notes (optional)</label>
+                            </div>
+                            <div class="alert alert-warning small mb-0">
+                                Reopening will move this customer back into Active pipeline and log a timeline event.
+                            </div>
+                        </div>
+                        <div class="modal-footer p-4 pt-0">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-premium"><i class="fa-solid fa-rotate me-2"></i>Reopen</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    <script>
+        // --- SIDEBAR USER POPULATION (identity) ---
+        document.addEventListener('DOMContentLoaded', () => {
+            try {
+                const el = document.getElementById('sidebarUserFirm');
+                let user = JSON.parse(localStorage.getItem('user'));
+                if(user && (user.firmName || user.fullName || user.email)){
+                    const displayName = user.fullName || user.email || 'User';
+                    const firm = user.firmName || 'Firm';
+                    el.innerHTML = `${displayName} <span class='text-dark'>|</span> ${firm}`;
+                }
+            } catch {}
+            bootstrapDirectory();
+        });
+
+        // --- BACKEND INTEGRATION CONFIG ---
+        const API_CUSTOMERS = 'http://localhost:3000/api/customers';
+        const API_PROPERTIES = 'http://localhost:3000/api/properties';
+        let customers = []; // raw customer payloads
+        let properties = []; // raw properties
+        let filteredCustomers = []; // for list filtering
+        let isLoading = true;
+
+        async function bootstrapDirectory(){
+            showLoadingList();
+            try {
+                const [cRes, pRes] = await Promise.all([
+                    fetch(API_CUSTOMERS),
+                    fetch(API_PROPERTIES)
+                ]);
+                customers = await cRes.json();
+                properties = await pRes.json();
+                // Include all statuses (active + closed)
+                filteredCustomers = [...customers];
+                renderList(filteredCustomers);
+            } catch(err){
+                console.error(err);
+                document.getElementById('customerList').innerHTML = `<div class="p-4 text-center text-muted">Failed loading directory.<br><small>${err.message||'Network error'}</small></div>`;
+            } finally { isLoading = false; }
+        }
+
+        function showLoadingList(){
+            document.getElementById('customerList').innerHTML = `<div class='d-flex flex-column align-items-center justify-content-center py-5'>
+                <div class='spinner-border text-warning mb-3'></div>
+                <div class='text-muted small'>Loading master directory…</div>
+            </div>`;
+        }
+
+        // --- RENDER LIST ---
+        function renderList(data) {
+            const list = document.getElementById('customerList');
+            if(!data.length){
+                list.innerHTML = `<div class='p-5 text-center text-muted'>No customers found</div>`; return;
+            }
+            list.innerHTML = data.map((c, index) => {
+                const initials = (c.name||'').split(' ').map(p=>p[0]).join('').substring(0,2).toUpperCase() || 'CU';
+                const isClosed = c.status === 'Closed';
+                const budgetStr = c.budget ? `₹${Number(c.budget).toLocaleString('en-IN')}` : '';
+                return `<div class="customer-item" onclick="selectCustomer('${c.custId}', this)">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avatar-small">${initials}</div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="mb-0 fw-bold">${c.name||'Unnamed'}</h6>
+                                <small class="text-muted" style="font-size:0.7rem">${c.custId||'—'}</small>
+                            </div>
+                            <p class="text-muted small mb-0">${c.typology || c.dealType || c.status || ''} ${budgetStr? '• '+budgetStr: ''}</p>
+                        </div>
+                    </div>
+                    ${isClosed ? '<i class="fa-solid fa-check-circle text-success position-absolute top-50 end-0 translate-middle-y me-3" title="Closed Deal"></i>' : ''}
+                </div>`;
+            }).join('');
+        }
+
+        // --- SELECT CUSTOMER (THE LOGIC) ---
+        async function selectCustomer(custId, el){
+            document.querySelectorAll('.customer-item').forEach(i=>i.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('emptyState').style.display='none';
+            const panel = document.getElementById('dossierPanel');
+            panel.style.display='block';
+            const c = customers.find(x=>x.custId===custId);
+            if(!c){ panel.innerHTML = '<div class="p-4">Customer not found</div>'; return; }
+            // Derive avatar initials
+            const initials = (c.name||'').split(' ').map(p=>p[0]).join('').substring(0,2).toUpperCase() || 'CU';
+            // Build assets from properties
+            const assets = properties.filter(p=>p.customerCustId===custId);
+            const latestClosedAsset = assets.filter(a=>a.closedDate).sort((a,b)=> new Date(b.closedDate) - new Date(a.closedDate))[0];
+            let ltv = assets.reduce((sum,a)=> sum + (Number(a.price)||0),0);
+            if(ltv === 0){
+                // Fallback 1: parse price from close/deal notes if any
+                const priceFromNotes = (c.notes||[]).reduce((sum,n)=>{
+                    if(!n || !n.text) return sum;
+                    const m = n.text.match(/price\s*[:\-]?\s*₹?\s*([\d,]+)/i);
+                    if(m && m[1]){
+                        const val = Number(m[1].replace(/,/g,''));
+                        return sum + (isNaN(val)?0:val);
+                    }
+                    return sum;
+                }, 0);
+                if(priceFromNotes > 0) ltv = priceFromNotes;
+            }
+            if(ltv === 0){
+                // Fallback 2: if closed and budget present, use budget as proxy once
+                if(c.status === 'Closed' && Number(c.budget) > 0){
+                    ltv = Number(c.budget);
+                }
+            }
+            // Tag heuristics
+            const tags = [];
+            if(ltv > 50000000) tags.push('VIP');
+            if(assets.length >= 2) tags.push('Investor');
+            if(c.status==='Closed') tags.push('Closed');
+            // Fetch notes lazily
+            let notes = [];
+            try {
+                const nRes = await fetch(`${API_CUSTOMERS}/${custId}/notes`);
+                const nJson = await nRes.json();
+                if(nRes.ok && nJson.success) notes = nJson.data || []; else notes = c.notes || [];
+            } catch { notes = c.notes || []; }
+            // Timeline compose
+            const timeline = [];
+            // Add customer creation event first (if available)
+            if(c.createdAt){
+                timeline.push({ date: c.createdAt, type:'entry', title:'Customer Added', desc: 'Initial registration' });
+            }
+            // Build timeline: avoid duplicated created + follow-up entries for the same note
+            notes.forEach(n=>{
+                const hasFollowUp = !!n.followUpDate;
+                if(hasFollowUp){
+                    // Show only the follow-up date as the event (single meaningful point in future)
+                    timeline.push({
+                        date: n.followUpDate,
+                        type: 'follow-up',
+                        title: 'Follow Up',
+                        desc: n.text
+                    });
+                } else {
+                    // Regular note without follow-up
+                    timeline.push({
+                        date: n.createdAt,
+                        type: n.type||'note',
+                        title: (n.type||'Note').replace(/\b\w/g,l=>l.toUpperCase()),
+                        desc: n.text
+                    });
+                }
+            });
+            assets.forEach(a=>{
+                if(a.closedDate) timeline.push({ date: a.closedDate, type:'deal', title:'Deal Closed', desc: `${a.title||'Property'} • ₹${(a.price||0).toLocaleString('en-IN')}` });
+                else if(a.createdAt) timeline.push({ date: a.createdAt, type:'asset', title:'Asset Linked', desc: a.title||'Property' });
+            });
+            timeline.sort((a,b)=> new Date(b.date) - new Date(a.date));
+                        const assetHTML = assets.length ? assets.map(a=>`<div class='asset-card'>
+                <div class='asset-thumb d-flex align-items-center justify-content-center bg-light text-muted'>${a.title? a.title.substring(0,1).toUpperCase(): 'P'}</div>
+                <div>
+                  <h6 class='mb-0 fw-bold'>${a.title||'Property'}</h6>
+                  <small class='text-muted'>${a.location||''} • ₹${(a.price||0).toLocaleString('en-IN')}</small>
+                </div>
+            </div>`).join('') : "<p class='text-muted small text-center py-3'>No assets recorded.</p>";
+                        const timelineHTML = timeline.length ? timeline.map(t=>{
+                let icon='fa-circle'; let rowClass='';
+                if(t.type==='deal') {icon='fa-handshake'; rowClass='deal';}
+                else if(t.type==='follow-up'){icon='fa-calendar-check'; rowClass='visit';}
+                else if(t.type==='asset'){icon='fa-building';}
+                                else if(t.type==='entry'){icon='fa-user-plus';}
+                else if(t.type==='call'){icon='fa-phone';}
+                else if(t.type==='meeting'){icon='fa-people-arrows';}
+                return `<div class='timeline-event ${rowClass}'>
+                    <div class='timeline-dot d-flex align-items-center justify-content-center' style='font-size:.55rem'><i class='fa-solid ${icon}'></i></div>
+                    <div class='timeline-date'>${t.date? new Date(t.date).toLocaleDateString('en-IN'):'—'}</div>
+                    <div class='timeline-content'><strong>${t.title}</strong><p class='mb-0 text-muted'>${t.desc}</p></div>
+                </div>`;
+            }).join('') : "<p class='text-muted small'>No interaction history yet.</p>";
+            const ltvFormatted = `₹${(Number(ltv)||0).toLocaleString('en-IN')}`;
+                        const budgetFormatted = c.budget ? `₹${Number(c.budget).toLocaleString('en-IN')}` : '—';
+                        const propertyTypesList = (c.propertyTypes||[]).map(t=>`<span class='badge bg-light text-dark border fw-normal' style='font-size:.6rem; letter-spacing:.5px; margin:2px;'>${t}</span>`).join('');
+                        const snapshotDealTitle = latestClosedAsset?.title || c.dealType || '—';
+                        const snapshotTypology = latestClosedAsset?.typology || latestClosedAsset?.segment || c.typology || '—';
+                        const snapshotBhk = latestClosedAsset?.bhk || c.bhk || '—';
+                        panel.innerHTML = `
+                <div class='dossier-header'>
+                  <div class='d-flex justify-content-between align-items-start'>
+                    <div class='d-flex gap-4'>
+                      <div class='bg-dark text-white rounded-circle d-flex align-items-center justify-content-center display-5 brand-font' style='width:80px; height:80px;'>${initials}</div>
+                      <div>
+                        <h2 class='brand-font mb-0'>${c.name||'Unnamed Customer'}</h2>
+                        <p class='text-muted mb-2'>${c.phone||''} ${c.email? '• '+c.email:''}</p>
+                        <div class='d-flex gap-2'>${tags.map(t=>`<span class='tag-pill ${t==='VIP'?'tag-vip': (t==='Investor'?'tag-hni':'tag-investor')}'>${t}</span>`).join('')}</div>
+                      </div>
+                    </div>
+                    <div class='text-end'>
+                      <small class='text-muted text-uppercase d-block mb-1'>Lifetime Value</small>
+                      <h2 class='text-gold fw-bold mb-3'>${ltvFormatted}</h2>
+                      <div class='d-flex gap-2 justify-content-end'>
+                        <button class='btn btn-sm btn-outline-dark rounded-circle w-40px h-40px' title='Call'><i class='fa-solid fa-phone'></i></button>
+                        <button class='btn btn-sm btn-outline-dark rounded-circle w-40px h-40px' title='Email'><i class='fa-solid fa-envelope'></i></button>
+                        <button class='btn btn-sm btn-outline-dark rounded-circle w-40px h-40px' title='WhatsApp'><i class='fa-brands fa-whatsapp'></i></button>
+                                                ${c.status==='Closed' ? `<button class='btn btn-sm btn-warning rounded-circle w-40px h-40px' title='Reopen' onclick="openReopenModal('${c.custId}','${(c.name||'').replace(/'/g,"&#39;")}')"><i class='fa-solid fa-rotate-left'></i></button>`:''}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class='row'>
+                  <div class='col-md-5 border-end'>
+                    <h6 class='brand-font mb-3'>Portfolio</h6>
+                    ${assetHTML}
+                    <div class='mt-4 p-3 bg-light rounded-3'>
+                      <h6 class='brand-font'>Key Requirement</h6>
+                      <p class='small text-muted mb-0'>${c.req || 'No requirement captured.'}</p>
+                    </div>
+                                        <div class='mt-4 p-3 bg-light rounded-3'>
+                                            <h6 class='brand-font mb-2'>Profile Snapshot</h6>
+                                            <div class='small'>
+                                                <div class='d-flex justify-content-between'><span class='text-muted'>Status</span><strong>${c.status||'—'}</strong></div>
+                                                <div class='d-flex justify-content-between'><span class='text-muted'>Last Deal / Project</span><strong>${snapshotDealTitle}</strong></div>
+                                                <div class='d-flex justify-content-between'><span class='text-muted'>Typology</span><strong>${snapshotTypology}</strong></div>
+                                                <div class='d-flex justify-content-between'><span class='text-muted'>BHK</span><strong>${snapshotBhk}</strong></div>
+                                                <div class='d-flex justify-content-between'><span class='text-muted'>Budget</span><strong class='text-gold'>${budgetFormatted}</strong></div>
+                                                <div class='d-flex justify-content-between'><span class='text-muted'>Created</span><strong>${c.createdAt? new Date(c.createdAt).toLocaleDateString('en-IN'): '—'}</strong></div>
+                                            </div>
+                                            ${propertyTypesList? `<div class='mt-2'>${propertyTypesList}</div>`:''}
+                                        </div>
+                  </div>
+                  <div class='col-md-7 ps-4'>
+                    <h6 class='brand-font mb-3'>Interaction History</h6>
+                    <div class='timeline'>${timelineHTML}</div>
+                  </div>
+                </div>`;
+            gsap.from('#dossierPanel > div', {y:20, opacity:0, duration:.4, stagger:.1});
+        }
+
+        // --- REOPEN CUSTOMER FLOW ---
+        function openReopenModal(custId, name){
+            document.getElementById('reopenCustId').value = custId;
+            document.getElementById('reopenCustomerName').textContent = name + ' (ID ' + custId + ')';
+            const modal = new bootstrap.Modal(document.getElementById('reopenCustomerModal'));
+            modal.show();
+        }
+
+        async function handleReopenCustomer(e){
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const custId = formData.get('custId');
+            const newReq = formData.get('newReq').trim();
+            const newStatus = formData.get('newStatus');
+            const context = formData.get('context').trim();
+            if(!newReq){ return; }
+            try {
+                // Update customer status & requirement
+                const res = await fetch(`${API_CUSTOMERS}/${custId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus.startsWith('Interested') ? 'Interested' : newStatus, req: newReq })
+                });
+                const json = await res.json();
+                if(!res.ok){ throw new Error(json.message||'Failed to reopen'); }
+                // Log note & timeline event
+                const noteText = `Reopened with requirement: ${newReq}${context?` | Context: ${context}`:''}`;
+                try {
+                    await fetch(`${API_CUSTOMERS}/${custId}/notes`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: noteText, type: 'general' })
+                    });
+                } catch(noteErr){ console.warn('Reopen note failed', noteErr); }
+                // Refresh data sets
+                await bootstrapDirectory();
+                // Reselect customer to show updated snapshot
+                setTimeout(()=>{
+                    const el = Array.from(document.querySelectorAll('.customer-item')).find(div=>div.innerHTML.includes(custId));
+                    if(el) selectCustomer(custId, el);
+                },400);
+                const modal = bootstrap.Modal.getInstance(document.getElementById('reopenCustomerModal'));
+                modal.hide();
+            } catch(err){
+                alert('Reopen failed: '+ err.message);
+            }
+        }
+
+        // --- FILTER ---
+        function filterList(){
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            filteredCustomers = customers.filter(c => {
+                return (c.name && c.name.toLowerCase().includes(term)) ||
+                       (c.custId && c.custId.toLowerCase().includes(term)) ||
+                       (c.phone && c.phone.includes(term));
+            });
+            renderList(filteredCustomers);
+        }
+
+        // Initial content handled in bootstrapDirectory()
+    </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+{
+  "name": "grow",
+  "version": "1.0.0",
+  "description": "Built to help you grow | Built to help you grow",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pravin-18M/grow.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Pravin-18M/grow/issues"
+  },
+  "homepage": "https://github.com/Pravin-18M/grow#readme",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "mongoose": "^8.0.3",
+    "nodemon": "^3.0.2",
+    "multer": "^1.4.5-lts",
+    "nodemailer": "^6.9.8"
+    ,"@google/generative-ai": "^0.7.0"
+  }
+}

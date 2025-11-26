@@ -1,0 +1,1919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grwo | Client Intelligence</title>
+    
+    <!-- External Resources -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ----------------------------------------------------------------
+           CORE VARIABLES & DESIGN SYSTEM (MATCHING PROPERTIES)
+        ---------------------------------------------------------------- */
+        :root {
+            --primary: #1a1a1a;
+            --gold: #d4af37;
+            --bg: #f8f9fa;
+            --glass: rgba(255, 255, 255, 0.95);
+            --border: rgba(0,0,0,0.05);
+            --shadow-soft: 0 10px 40px rgba(0,0,0,0.05);
+            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        .brand-font { font-family: 'Playfair Display', serif; }
+        .text-gold { color: var(--gold) !important; }
+        .bg-gold { background-color: var(--gold) !important; }
+        .text-accent { color: var(--accent) !important; }
+        .text-success { color: var(--success) !important; }
+        .text-warning { color: var(--warning) !important; }
+        .text-danger { color: var(--danger) !important; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px; background: #fff; border-right: 1px solid #eee;
+            padding: 30px; position: fixed; height: 100vh; z-index: 100;
+            display: flex; flex-direction: column;
+        }
+
+        .nav-link {
+            color: #666; font-weight: 500; padding: 12px 20px;
+            border-radius: 12px; margin-bottom: 5px; display: flex; align-items: center; gap: 12px;
+            transition: var(--transition); text-decoration: none;
+        }
+        .nav-link:hover, .nav-link.active {
+            background: var(--primary); color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .nav-link.active i { color: var(--gold); }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 280px; width: calc(100% - 280px); padding: 40px;
+            min-height: 100vh;
+        }
+
+        /* SEARCH BAR - PREMIUM DESIGN (MATCHING PROPERTIES) */
+        .search-bar-container {
+            background: #fff;
+            border-radius: 60px;
+            padding: 8px 24px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+        .search-bar-container:focus-within {
+            border-color: var(--gold);
+            box-shadow: 0 12px 40px rgba(212, 175, 55, 0.15);
+        }
+        .search-bar-container input {
+            border: none;
+            background: transparent;
+            flex: 1;
+            padding: 12px 0;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .search-bar-container i {
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+
+        /* FILTER PILLS (MATCHING PROPERTIES) */
+        .filter-pills-container {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .filter-pill {
+            background: #fff;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 50px;
+            padding: 10px 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        .filter-pill:hover {
+            border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+        .filter-pill.active {
+            background: linear-gradient(135deg, var(--primary), #2a2a2a);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 6px 20px rgba(26, 26, 26, 0.2);
+        }
+        .filter-pill i {
+            font-size: 0.9rem;
+        }
+        .filter-pill .badge {
+            background: var(--gold);
+            color: #1a1a1a;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        
+        /* CLIENT CARDS (MATCHING PROPERTY CARDS) */
+        .client-card {
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            border: 1px solid #f0f0f0;
+        }
+        .client-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.12);
+        }
+        
+        .avatar-circle {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: var(--primary); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-family: 'Playfair Display'; margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f8f9fa;
+        }
+        .info-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: #888; }
+        .info-value { font-weight: 600; color: var(--primary); }
+
+        /* BUTTONS (MATCHING PROPERTIES) */
+        .btn-premium {
+            background: var(--primary); color: #fff; border-radius: 50px; padding: 10px 30px; 
+            border: none; font-weight: 600; transition: var(--transition);
+        }
+        .btn-premium:hover { 
+            background: var(--gold); color: #fff; transform: translateY(-2px); 
+            box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2); 
+        }
+
+        .btn-action {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: 1.5px solid #e0e0e0;
+            background: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #666;
+        }
+        .btn-action:hover {
+            border-color: var(--gold);
+            background: var(--gold);
+            color: #fff;
+            transform: scale(1.1);
+        }
+        .btn-action.edit:hover { border-color: #4f46e5; background: #4f46e5; }
+        .btn-action.delete:hover { border-color: #dc3545; background: #dc3545; }
+        .btn-action.notes:hover { border-color: #f59e0b; background: #f59e0b; }
+
+        /* BADGES */
+        .badge-status {
+            position: absolute; top: 20px; right: 20px;
+            padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+        }
+        .status-New { background: #eef2ff; color: #4f46e5; }
+        .status-Interested { background: #fff8e1; color: #d4af37; }
+        .status-Closed { background: #ecfdf5; color: #059669; }
+
+        /* MODAL - ULTRA PREMIUM (MATCHING PROPERTIES) */
+        .modal-content { 
+            border-radius: 28px; 
+            border: none; 
+            box-shadow: 0 30px 90px rgba(0,0,0,0.25); 
+            overflow: hidden;
+        }
+        .modal-header { 
+            background: linear-gradient(135deg, var(--primary) 0%, #2a2a2a 100%);
+            border: none;
+            padding: 32px 40px;
+            position: relative;
+        }
+        .modal-header::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--gold), #f4d47b, var(--gold));
+        }
+        .modal-title {
+            color: #fff;
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+        .modal-header .btn-close {
+            filter: invert(1);
+            opacity: 0.8;
+        }
+        .modal-header .btn-close:hover {
+            opacity: 1;
+        }
+        .modal-body { 
+            padding: 40px; 
+            background: #fafbfc;
+            max-height: 75vh;
+            overflow-y: auto;
+        }
+        
+        /* FORM CONTROLS - PREMIUM (MATCHING PROPERTIES) */
+        .form-label { 
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+        .form-control, .form-select { 
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1.5px solid #e0e0e0;
+            background: #fff;
+            font-size: 0.95rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .form-control:focus, .form-select:focus { 
+            border-color: var(--gold);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.1);
+            background: #fff;
+            transform: translateY(-1px);
+            outline: none;
+        }
+        .form-control::placeholder {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        .form-floating {
+            position: relative; margin-bottom: 20px;
+        }
+        .form-floating .form-control, .form-floating .form-select {
+            height: auto; padding: 20px 16px 8px 16px;
+        }
+        .form-floating label {
+            position: absolute; top: 16px; left: 16px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none;
+            color: #94a3b8; font-size: 15px; font-weight: 400;
+        }
+        .form-floating .form-control:focus ~ label,
+        .form-floating .form-control:not(:placeholder-shown) ~ label,
+        .form-floating .form-select:focus ~ label,
+        .form-floating .form-select:not([value=""]) ~ label {
+            top: 8px; font-size: 11px; font-weight: 600;
+            color: var(--gold); text-transform: uppercase; letter-spacing: 0.5px;
+        }
+
+        /* TOAST NOTIFICATION */
+        .custom-toast {
+            position: fixed; bottom: 30px; right: 30px; background: var(--primary); color: #fff;
+            padding: 15px 25px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex; align-items: center; gap: 15px; z-index: 9999;
+            transform: translateY(100px); opacity: 0; transition: 0.4s;
+        }
+        /* PROPERTY TYPE CHECKBOXES */
+        .property-type-option {
+            background: #fff; border: 2px solid #e8e8e8;
+            border-radius: 16px; padding: 16px 18px;
+            display: flex; align-items: center; gap: 12px; cursor: pointer;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1); 
+            font-size: 14px; font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .property-type-option:hover {
+            background: #fff; border-color: var(--gold);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.15);
+        }
+        .property-type-option input[type="checkbox"] {
+            width: 20px; height: 20px; cursor: pointer; 
+            accent-color: var(--gold);
+            border: 2px solid #ddd; border-radius: 4px;
+        }
+        .property-type-option input[type="checkbox"]:checked + span {
+            color: var(--gold); font-weight: 600;
+        }
+        .property-type-option input[type="checkbox"]:checked {
+            background-color: var(--gold); border-color: var(--gold);
+        }
+        .property-type-option:has(input:checked) {
+            background: linear-gradient(135deg, rgba(212,175,55,0.05), rgba(212,175,55,0.1));
+            border-color: var(--gold);
+            box-shadow: 0 4px 16px rgba(212, 175, 55, 0.2);
+        }
+        
+        /* FORM SECTION STYLING */
+        .form-section {
+            animation: slideInUp 0.5s ease-out;
+        }
+        
+        /* PREMIUM MODAL SCROLLBAR */
+        .modal-body::-webkit-scrollbar {
+            width: 8px;
+        }
+        .modal-body::-webkit-scrollbar-track {
+            background: #f0f0f0;
+            border-radius: 10px;
+        }
+        .modal-body::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, var(--primary), var(--gold));
+            border-radius: 10px;
+        }
+
+        /* NOTES & TIMELINE */
+        .note-item {
+            background: rgba(255,255,255,0.9); border: 1px solid rgba(0,0,0,0.08);
+            border-radius: var(--border-radius); padding: 16px; margin-bottom: 12px;
+            border-left: 4px solid var(--accent);
+        }
+        .note-item.follow-up { border-left-color: var(--warning); }
+        .note-item.call { border-left-color: var(--success); }
+        .note-item.meeting { border-left-color: var(--gold); }
+        .note-item .note-meta {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px; font-size: 12px; color: #64748b;
+        }
+        .note-item .note-type-badge {
+            background: var(--accent); color: #fff; padding: 2px 8px;
+            border-radius: 12px; font-size: 10px; font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* CUSTOMER ACTIONS */
+        .customer-actions {
+            position: absolute; top: 16px; right: 16px;
+            background: rgba(255,255,255,0.98); 
+            border-radius: 50px; padding: 6px;
+            opacity: 0; transform: translateY(-10px);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .client-card:hover .customer-actions {
+            opacity: 1; transform: translateY(0);
+        }
+        .customer-actions .btn-action {
+            width: 36px; height: 36px; margin: 2px;
+        }
+        
+        /* CUSTOMERS GRID (MATCHING PROPERTIES) */
+        .customers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        /* VIEW TOGGLE BUTTONS */
+        .view-toggle {
+            display: flex;
+            gap: 6px;
+            background: #f0f0f0;
+            padding: 4px;
+            border-radius: 50px;
+            align-items: center;
+        }
+        .view-toggle-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .view-toggle-btn:hover {
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+        .view-toggle-btn.active {
+            background: #fff;
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-weight: 600;
+        }
+
+        /* CUSTOMERS LIST TABLE */
+        .customers-table {
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+            border: 1px solid #f0f0f0;
+            margin-top: 20px;
+        }
+        .customers-table table {
+            width: 100%;
+            margin: 0;
+        }
+        .customers-table thead tr {
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            color: #fff;
+        }
+        .customers-table th {
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            padding: 16px 18px;
+            border: none;
+        }
+        .customers-table tbody td {
+            padding: 16px 18px;
+            font-size: 0.9rem;
+            vertical-align: middle;
+            border-top: 1px solid #f5f5f5;
+        }
+        .customers-table tbody tr {
+            transition: all 0.3s;
+        }
+        .customers-table tbody tr:hover {
+            background: #fffdf4;
+            box-shadow: inset 0 4px 12px rgba(212, 175, 55, 0.08);
+        }
+        .customers-table .property-thumb {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .customers-table .w-40px {
+            width: 40px !important;
+        }
+        .customers-table .h-40px {
+            height: 40px !important;
+        }
+
+        /* ENHANCED ANIMATIONS */
+        @keyframes slideInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeInScale {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .animate-slide-up { animation: slideInUp 0.5s ease-out; }
+        .animate-fade-scale { animation: fadeInScale 0.3s ease-out; }
+
+        /* TOAST NOTIFICATIONS (MATCHING PROPERTIES) */
+        .app-toast { 
+            min-width:260px; background:#1a1a1a; color:#fff; padding:14px 18px; 
+            border-radius:14px; box-shadow:0 6px 20px rgba(0,0,0,0.25); 
+            font-size:0.85rem; display:flex; align-items:flex-start; gap:10px; 
+            opacity:0; transform:translateY(-8px); 
+            transition: all .4s cubic-bezier(.16,1,.3,1); 
+        }
+        .app-toast.success { background:#198754; }
+        .app-toast.error { background:#dc3545; }
+        .app-toast.info { background:#0d6efd; }
+        .app-toast.show { opacity:1; transform:translateY(0); }
+
+        /* PAGE LOADER */
+        .page-loader { 
+            height: 60vh; display: flex; align-items: center; 
+            justify-content: center; 
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar d-flex flex-column">
+        <a href="dashboard.html" class="d-flex align-items-center mb-4 text-decoration-none text-dark">
+            <span class="fs-3 fw-bold brand-font">Grwo<span class="text-gold">.</span></span>
+        </a>
+        <ul class="nav nav-pills flex-column mb-auto">
+            <li><a href="dashboard.html" class="nav-link"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+            <li><a href="properties.html" class="nav-link"><i class="fa-solid fa-building"></i> Properties</a></li>
+            <li><a href="customers.html" class="nav-link active"><i class="fa-solid fa-users"></i> Customers</a></li>
+            <li><a href="calender_tasks.html" class="nav-link"><i class="fa-regular fa-calendar-check"></i> Calendar</a></li>
+            <li><a href="reach.html" class="nav-link"><i class="fa-solid fa-paper-plane"></i> Reach</a></li>
+            <li><a href="customerdirectory.html" class="nav-link"><i class="fa-solid fa-address-book"></i> Customer Directory</a></li>
+            <li><a href="analytics.html" class="nav-link"><i class="fa-solid fa-chart-line"></i> Analytics</a></li>
+            <li><a href="grwoai.html" class="nav-link"><i class="fa-solid fa-brain"></i> GrwoAI</a></li>
+            <li><a href="index.html" class="nav-link mt-5 text-danger"><i class="fa-solid fa-right-from-bracket"></i> Logout</a></li>
+        </ul>
+        <div class="mt-auto">
+            <div class="p-3 bg-light rounded-4 border text-center">
+                <small class="text-muted d-block text-uppercase" style="font-size: 0.7rem;">Logged in as</small>
+                <strong class="text-gold" id="sidebarUserFirm">User <span class="text-dark">|</span> Firm</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+                <script>
+                    // Update sidebar with real user and firm name from localStorage
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const sidebarUserFirm = document.getElementById('sidebarUserFirm');
+                        let user = null;
+                        try { user = JSON.parse(localStorage.getItem('user')); } catch {}
+                        if (user && user.firmName) {
+                            const nameToShow = user.fullName || user.email || 'User';
+                            sidebarUserFirm.innerHTML = `${nameToShow} <span class="text-dark">|</span> ${user.firmName}`;
+                        } else {
+                            sidebarUserFirm.innerHTML = 'User <span class="text-dark">|</span> Firm';
+                        }
+                    });
+                </script>
+        
+        <!-- HEADER -->
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h6 class="text-gold text-uppercase mb-1" style="font-size:0.75rem; font-weight:600; letter-spacing:2px;">Customer Relationship Management</h6>
+                <h2 class="brand-font display-6 fw-bold mb-0">Client Intelligence</h2>
+            </div>
+            <button class="btn btn-premium" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+                <i class="fa-solid fa-user-plus me-2"></i> Add New Customer
+            </button>
+        </div>
+
+        <!-- PREMIUM SEARCH & FILTER INTERFACE (MATCHING PROPERTIES) -->
+        <div class="mb-4">
+            <!-- SEARCH BAR WITH VIEW TOGGLE -->
+            <div class="search-bar-container mb-3">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search customers by name, phone, email, or requirement..." 
+                       style="width:100%;">
+                <div class="view-toggle ms-auto">
+                    <button class="view-toggle-btn active" data-view="grid" onclick="toggleCustomerView('grid')">
+                        <i class="fa-solid fa-grip"></i> Grid
+                    </button>
+                    <button class="view-toggle-btn" data-view="list" onclick="toggleCustomerView('list')">
+                        <i class="fa-solid fa-list"></i> List
+                    </button>
+                </div>
+            </div>
+
+            <!-- FILTER PILLS -->
+            <div class="filter-pills-container">
+                <span class="text-muted fw-medium" style="font-size:0.85rem;">Filter by:</span>
+                <div class="filter-pill active" data-filter="all">
+                    <i class="fa-solid fa-users"></i> All Customers
+                </div>
+                <div class="filter-pill" data-filter="New">
+                    <i class="fa-solid fa-star"></i> New Leads
+                </div>
+                <div class="filter-pill" data-filter="Interested">
+                    <i class="fa-solid fa-handshake"></i> Interested
+                </div>
+                <div class="filter-pill" data-filter="Closed">
+                    <i class="fa-solid fa-circle-check"></i> Closed Deals
+                </div>
+                
+                <div style="margin-left:auto; display:flex; align-items:center; gap:12px;">
+                    <span class="text-muted fw-medium" style="font-size:0.85rem;">Sort:</span>
+                    <select class="form-select form-select-sm" id="sortSelect" 
+                            style="width:auto; border-radius:50px; padding:8px 16px; border:1.5px solid #e0e0e0; font-size:0.85rem;">
+                        <option value="name">Name A-Z</option>
+                        <option value="name-desc">Name Z-A</option>
+                        <option value="budget">Budget High-Low</option>
+                        <option value="budget-asc">Budget Low-High</option>
+                        <option value="recent">Recently Added</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Row -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="p-4 bg-white rounded-4 border d-flex align-items-center justify-content-between">
+                    <div><p class="text-muted mb-0 small text-uppercase">Total Leads</p><h3 class="fw-bold mb-0" id="stat-total">0</h3></div>
+                    <div class="bg-light rounded-circle p-3 text-primary"><i class="fa-solid fa-users fa-lg"></i></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 bg-white rounded-4 border d-flex align-items-center justify-content-between">
+                    <div><p class="text-muted mb-0 small text-uppercase">High Intent</p><h3 class="fw-bold mb-0 text-gold" id="stat-intent">0</h3></div>
+                    <div class="bg-light rounded-circle p-3 text-gold"><i class="fa-solid fa-star fa-lg"></i></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="p-4 bg-white rounded-4 border d-flex align-items-center justify-content-between">
+                    <div><p class="text-muted mb-0 small text-uppercase">Potential Value</p><h3 class="fw-bold mb-0" id="stat-value">₹0</h3></div>
+                    <div class="bg-light rounded-circle p-3 text-success"><i class="fa-solid fa-sack-dollar fa-lg"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DATA CONTAINER -->
+        <div id="leads-container">
+            <!-- Loader acts as initial state -->
+            <div style="height: 60vh; display: flex; align-items: center; justify-content: center;">
+                <div class="spinner-border text-warning" role="status"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD CUSTOMER MODAL -->
+    <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="border-radius:32px; overflow:hidden;">
+                <div class="modal-header p-0 border-0">
+                    <div style="background:linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #2d2d2d 100%); width:100%; padding:40px 48px; position:relative; overflow:hidden;">
+                        <div style="position:absolute; top:0; right:0; width:400px; height:400px; background:radial-gradient(circle, rgba(212,175,55,0.15) 0%, transparent 70%); border-radius:50%; transform:translate(30%, -50%);"></div>
+                        <div style="position:relative; z-index:1;">
+                            <div style="display:inline-flex; align-items:center; gap:12px; background:rgba(212,175,55,0.15); padding:8px 20px; border-radius:50px; margin-bottom:16px; border:1px solid rgba(212,175,55,0.3);">
+                                <i class="fa-solid fa-sparkles" style="color:var(--gold); font-size:14px;"></i>
+                                <span style="color:var(--gold); font-size:13px; font-weight:600; letter-spacing:1px;">ADD LEAD</span>
+                            </div>
+                            <h4 class="brand-font fw-bold mb-2" style="color:#fff; font-size:2rem; letter-spacing:-0.5px;">Create New Lead</h4>
+                            <p style="color:rgba(255,255,255,0.7); font-size:15px; margin:0;"></p>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" style="position:absolute; top:24px; right:24px; filter:invert(1) brightness(2); opacity:0.8; z-index:2;"></button>
+                        <div style="position:absolute; bottom:0; left:0; right:0; height:4px; background:linear-gradient(90deg, var(--gold) 0%, #f4d47b 50%, var(--gold) 100%);"></div>
+                    </div>
+                </div>
+                <div class="modal-body" style="padding:48px; background:linear-gradient(to bottom, #fafbfc 0%, #ffffff 100%);">
+                    <form id="addCustomerForm" onsubmit="handleAddCustomer(event)">
+                        
+                        <!-- SECTION 1: BASIC INFORMATION -->
+                        <div class="form-section mb-5">
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <div style="width:42px; height:42px; background:linear-gradient(135deg, var(--primary), #2d2d2d); border-radius:12px; display:flex; align-items:center; justify-content:center;">
+                                    <i class="fa-solid fa-user" style="color:var(--gold); font-size:18px;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold" style="font-size:16px; letter-spacing:0.5px;">Basic Information</h6>
+                                    <p class="text-muted mb-0" style="font-size:13px;">Essential customer contact details</p>
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" name="name" placeholder="Full Name" required>
+                                        <label><i class="fa-solid fa-user me-2 text-muted"></i>Full Name *</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control" name="email" placeholder="Email Address">
+                                        <label><i class="fa-solid fa-envelope me-2 text-muted"></i>Email Address</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <input type="tel" class="form-control" name="phone" placeholder="Phone Number" required>
+                                        <label><i class="fa-solid fa-phone me-2 text-muted"></i>Phone Number *</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 2: TRANSACTION DETAILS -->
+                        <div class="form-section mb-5">
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <div style="width:42px; height:42px; background:linear-gradient(135deg, var(--gold), #f4d47b); border-radius:12px; display:flex; align-items:center; justify-content:center;">
+                                    <i class="fa-solid fa-handshake" style="color:#1a1a1a; font-size:18px;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold" style="font-size:16px; letter-spacing:0.5px;">Transaction & Intent</h6>
+                                    <p class="text-muted mb-0" style="font-size:13px;">Define the nature of engagement</p>
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" name="dealType" required>
+                                            <option value="">Select Transaction Type</option>
+                                            <option value="Buy">Buy / Purchase</option>
+                                            <option value="Rent">Rent / Lease</option>
+                                            <option value="JV">Joint Venture (JV)</option>
+                                            <option value="Investment">Investment / Resale</option>
+                                            <option value="Consultation">Consultation Only</option>
+                                        </select>
+                                        <label><i class="fa-solid fa-handshake me-2 text-muted"></i>Deal Type *</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <input type="number" class="form-control" name="budget" placeholder="Budget in INR" required>
+                                        <label><i class="fa-solid fa-indian-rupee-sign me-2 text-muted"></i>Budget (INR) *</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 3: PROPERTY PREFERENCES -->
+                        <div class="form-section mb-5">
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <div style="width:42px; height:42px; background:linear-gradient(135deg, #4f46e5, #6366f1); border-radius:12px; display:flex; align-items:center; justify-content:center;">
+                                    <i class="fa-solid fa-building" style="color:#fff; font-size:18px;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold" style="font-size:16px; letter-spacing:0.5px;">Property Preferences</h6>
+                                    <p class="text-muted mb-0" style="font-size:13px;">Select property categories of interest</p>
+                                </div>
+                            </div>
+                            <div class="property-types-grid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px;">
+                                <label class="property-type-option property-type-checkbox" style="padding:16px;">
+                                    <input type="checkbox" name="propertyTypes" value="Apartment" class="form-check-input">
+                                    <span><i class="fa-solid fa-building me-2"></i>Apartment</span>
+                                </label>
+                                <label class="property-type-option property-type-checkbox" style="padding:16px;">
+                                    <input type="checkbox" name="propertyTypes" value="Villa" class="form-check-input">
+                                    <span><i class="fa-solid fa-home me-2"></i>Villa</span>
+                                </label>
+                                <label class="property-type-option property-type-checkbox" style="padding:16px;">
+                                    <input type="checkbox" name="propertyTypes" value="Penthouse" class="form-check-input">
+                                    <span><i class="fa-solid fa-crown me-2"></i>Penthouse</span>
+                                </label>
+                                <label class="property-type-option property-type-checkbox" style="padding:16px;">
+                                    <input type="checkbox" name="propertyTypes" value="Commercial Office" class="form-check-input">
+                                    <span><i class="fa-solid fa-briefcase me-2"></i>Office Space</span>
+                                </label>
+                                <label class="property-type-option property-type-checkbox" style="padding:16px;">
+                                    <input type="checkbox" name="propertyTypes" value="Retail Space" class="form-check-input">
+                                    <span><i class="fa-solid fa-store me-2"></i>Retail</span>
+                                </label>
+                                <label class="property-type-option property-type-checkbox" style="padding:16px;">
+                                    <input type="checkbox" name="propertyTypes" value="Land / Plot" class="form-check-input">
+                                    <span><i class="fa-solid fa-map me-2"></i>Land/Plot</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 4: RESIDENTIAL DETAILS (CONDITIONAL) -->
+                        <div class="form-section mb-5" id="residentialDetails" style="display:none;">
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <div style="width:42px; height:42px; background:linear-gradient(135deg, #059669, #10b981); border-radius:12px; display:flex; align-items:center; justify-content:center;">
+                                    <i class="fa-solid fa-home" style="color:#fff; font-size:18px;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold" style="font-size:16px; letter-spacing:0.5px;">Residential Specifications</h6>
+                                    <p class="text-muted mb-0" style="font-size:13px;">Configure housing requirements</p>
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" name="bhk">
+                                            <option value="">Select Configuration</option>
+                                            <option>Studio</option>
+                                            <option>1 BHK</option>
+                                            <option>2 BHK</option>
+                                            <option>3 BHK</option>
+                                            <option>4 BHK</option>
+                                            <option>5+ BHK</option>
+                                            <option>Penthouse</option>
+                                        </select>
+                                        <label><i class="fa-solid fa-door-open me-2 text-muted"></i>BHK Configuration</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating">
+                                        <select class="form-select" name="typology">
+                                            <option value="">Select Segment</option>
+                                            <option>Affordable</option>
+                                            <option>Mid-Range</option>
+                                            <option>Premium</option>
+                                            <option>Luxury</option>
+                                            <option>Ultra Luxury</option>
+                                        </select>
+                                        <label><i class="fa-solid fa-gem me-2 text-muted"></i>Property Segment</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SECTION 5: ADDITIONAL INFORMATION -->
+                        <div class="form-section mb-5">
+                            <div class="d-flex align-items-center gap-3 mb-4">
+                                <div style="width:42px; height:42px; background:linear-gradient(135deg, #dc2626, #ef4444); border-radius:12px; display:flex; align-items:center; justify-content:center;">
+                                    <i class="fa-solid fa-clipboard-list" style="color:#fff; font-size:18px;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0 fw-bold" style="font-size:16px; letter-spacing:0.5px;">Requirements & Status</h6>
+                                    <p class="text-muted mb-0" style="font-size:13px;">Capture detailed preferences and lead stage</p>
+                                </div>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-8">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" name="req" placeholder="Primary Requirement">
+                                        <label><i class="fa-solid fa-bullseye me-2 text-muted"></i>Primary Requirement</label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-floating">
+                                        <select class="form-select" name="status">
+                                            <option value="New">New Lead</option>
+                                            <option value="Interested">Interested</option>
+                                            <option value="Closed">Deal Closed</option>
+                                        </select>
+                                        <label><i class="fa-solid fa-chart-line me-2 text-muted"></i>Lead Status</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-floating mt-3">
+                                <textarea class="form-control" name="description" placeholder="Detailed notes..." style="height:120px; border-radius:16px;"></textarea>
+                                <label><i class="fa-solid fa-note-sticky me-2 text-muted"></i>Detailed Requirements & Notes</label>
+                            </div>
+                        </div>
+
+                        <!-- ACTION BUTTONS -->
+                        <div style="display:flex; gap:16px; padding-top:24px; border-top:2px solid #f0f0f0;">
+                            <button type="button" class="btn flex-fill" data-bs-dismiss="modal" style="background:#f8f9fa; color:#666; border:2px solid #e0e0e0; border-radius:16px; padding:16px; font-weight:600; font-size:15px; transition:all 0.3s;">
+                                <i class="fa-solid fa-xmark me-2"></i>Cancel
+                            </button>
+                            <button type="submit" class="btn flex-fill" style="background:linear-gradient(135deg, var(--primary), #2d2d2d); color:#fff; border:none; border-radius:16px; padding:16px; font-weight:600; font-size:15px; box-shadow:0 8px 24px rgba(26,26,26,0.25); transition:all 0.3s;">
+                                <i class="fa-solid fa-sparkles me-2"></i>Add Lead
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EDIT CUSTOMER MODAL -->
+    <div class="modal fade" id="editCustomerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header p-4">
+                    <div>
+                        <h5 class="modal-title brand-font fw-bold mb-1">Edit Customer Profile</h5>
+                        <p class="text-muted small mb-0">Update customer information</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 pt-0">
+                    <form id="editCustomerForm" onsubmit="handleEditCustomer(event)">
+                        <input type="hidden" name="customerId" id="editCustomerId">
+                        <!-- Form fields similar to add modal but pre-populated -->
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" name="name" id="editName" required>
+                                    <label>Full Name *</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="email" class="form-control" name="email" id="editEmail">
+                                    <label>Email Address</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="tel" class="form-control" name="phone" id="editPhone" required>
+                                    <label>Phone Number *</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control" name="budget" id="editBudget" required>
+                                    <label>Budget (INR) *</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-floating">
+                            <input type="text" class="form-control" name="req" id="editReq">
+                            <label>Primary Requirement</label>
+                        </div>
+                        <div class="form-floating">
+                            <textarea class="form-control" name="description" id="editDescription" style="height:100px;"></textarea>
+                            <label>Detailed Requirements & Notes</label>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <select class="form-select" name="bhk" id="editBhk">
+                                        <option value="">Select BHK</option>
+                                        <option>Studio</option>
+                                        <option>1 BHK</option>
+                                        <option>2 BHK</option>
+                                        <option>3 BHK</option>
+                                        <option>4 BHK</option>
+                                        <option>5+ BHK</option>
+                                        <option>Penthouse</option>
+                                    </select>
+                                    <label>BHK Configuration</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <select class="form-select" name="typology" id="editTypology">
+                                        <option value="">Select Typology</option>
+                                        <option>Affordable</option>
+                                        <option>Premium</option>
+                                        <option>Luxury</option>
+                                        <option>Ultra Luxury</option>
+                                        <option>Commercial</option>
+                                        <option>Investment</option>
+                                    </select>
+                                    <label>Property Typology</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <select class="form-select" name="status" id="editStatus">
+                                        <option value="New">New Lead</option>
+                                        <option value="Interested">Interested</option>
+                                        <option value="Closed">Deal Closed</option>
+                                    </select>
+                                    <label>Current Status</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-3 mt-4">
+                            <button type="button" class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-premium flex-fill">
+                                <i class="fa-solid fa-save me-2"></i>Update Profile
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div class="modal fade" id="deleteCustomerModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header p-4 border-bottom-0">
+                    <div>
+                        <h5 class="modal-title text-danger fw-bold mb-1">
+                            <i class="fa-solid fa-triangle-exclamation me-2"></i>Delete Customer
+                        </h5>
+                        <p class="text-muted small mb-0">This action cannot be undone</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 pt-0">
+                    <div class="alert alert-danger">
+                        <i class="fa-solid fa-exclamation-triangle me-2"></i>
+                        You are about to permanently delete <strong id="deleteCustomerName"></strong>'s profile.
+                    </div>
+                    <p class="text-muted mb-4">To confirm deletion, please type the customer's full name below:</p>
+                    <form id="deleteCustomerForm" onsubmit="handleDeleteCustomer(event)">
+                        <input type="hidden" name="customerId" id="deleteCustomerId">
+                        <div class="form-floating mb-4">
+                            <input type="text" class="form-control" id="deleteConfirmName" required>
+                            <label>Type customer name to confirm</label>
+                        </div>
+                        <div class="d-flex gap-3">
+                            <button type="button" class="btn btn-outline-secondary flex-fill" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-danger flex-fill" disabled id="deleteConfirmBtn">
+                                <i class="fa-solid fa-trash me-2"></i>Delete Forever
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTES MODAL -->
+    <div class="modal fade" id="notesModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header p-4">
+                    <div>
+                        <h5 class="modal-title fw-bold mb-1">
+                            <i class="fa-solid fa-sticky-note text-warning me-2"></i>Customer Notes
+                        </h5>
+                        <p class="text-muted small mb-0" id="notesCustomerName">Track interactions and follow-ups</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4 pt-0">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <form id="addNoteForm" onsubmit="handleAddNote(event)" class="mb-4">
+                                <input type="hidden" name="customerId" id="notesCustomerId">
+                                <div class="form-floating mb-3">
+                                    <textarea class="form-control" name="noteText" style="height:100px;" required></textarea>
+                                    <label>Add new note...</label>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="date" class="form-control" name="followUpDate">
+                                            <label>Follow-up Date</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <select class="form-select" name="noteType">
+                                                <!-- Backend enum allows: call, meeting, follow-up, general -->
+                                                <option value="general">General Note</option>
+                                                <option value="call">Phone Call</option>
+                                                <option value="meeting">Meeting</option>
+                                                <option value="follow-up">Follow-up</option>
+                                            </select>
+                                            <label>Note Type</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-premium mt-3">
+                                    <i class="fa-solid fa-plus me-2"></i>Add Note
+                                </button>
+                            </form>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="upcoming-followups">
+                                <h6 class="fw-bold mb-3 text-accent">
+                                    <i class="fa-solid fa-calendar-clock me-2"></i>Upcoming Follow-ups
+                                </h6>
+                                <div id="upcomingFollowUps" class="small"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="notes-timeline mt-4">
+                        <h6 class="fw-bold mb-3">
+                            <i class="fa-solid fa-history me-2"></i>Notes History
+                        </h6>
+                        <div id="notesHistory" class="notes-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLOSE DEAL MODAL -->
+    <div class="modal fade" id="closeDealModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header p-4">
+                    <div>
+                        <h5 class="modal-title fw-bold mb-1"><i class="fa-solid fa-circle-check text-success me-2"></i>Close Deal</h5>
+                        <p class="text-muted small mb-0" id="closeDealCustomerName">Finalize transaction</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form onsubmit="handleCloseDeal(event)">
+                    <div class="modal-body p-4 pt-0">
+                        <input type="hidden" name="closeDealCustomerId" id="closeDealCustomerId" />
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" name="propertyTitle" placeholder="Project / Property Title">
+                            <label>Project / Property Title (optional)</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" name="propertyLocation" placeholder="Location">
+                            <label>Location (optional)</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="number" class="form-control" name="propertyPrice" placeholder="Price">
+                            <label>Price (optional)</label>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" name="propertyTypology">
+                                        <option value="">Typology</option>
+                                        <option>Residential</option>
+                                        <option>Commercial</option>
+                                        <option>Land / Plot</option>
+                                        <option>Investment</option>
+                                        <option>Luxury</option>
+                                    </select>
+                                    <label>Typology</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" name="propertySegment">
+                                        <option value="">Segment</option>
+                                        <option>Affordable</option>
+                                        <option>Mid-Range</option>
+                                        <option>Premium</option>
+                                        <option>Luxury</option>
+                                        <option>Ultra Luxury</option>
+                                    </select>
+                                    <label>Segment</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <select class="form-select" name="propertyBhk">
+                                        <option value="">BHK</option>
+                                        <option>Studio</option>
+                                        <option>1 BHK</option>
+                                        <option>2 BHK</option>
+                                        <option>3 BHK</option>
+                                        <option>4 BHK</option>
+                                        <option>5+ BHK</option>
+                                        <option>Penthouse</option>
+                                    </select>
+                                    <label>BHK (if residential)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="number" class="form-control" name="propertySize" placeholder="Size SqFt">
+                                    <label>Size (SqFt)</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="number" class="form-control" name="propertyCommission" placeholder="Commission">
+                                    <label>Commission Earned (INR)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating mb-3">
+                                    <input type="text" class="form-control" name="propertySource" placeholder="Source Channel">
+                                    <label>Source Channel</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="alert alert-info small">
+                            Adding property details will create a closure note. Full property record can be added later in Properties.
+                        </div>
+                    </div>
+                    <div class="modal-footer p-4 pt-0">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-premium"><i class="fa-solid fa-lock me-2"></i>Confirm Closure</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER (MATCHING PROPERTIES) -->
+    <div id="toastContainer" style="position:fixed; top:20px; right:20px; z-index:2000; display:flex; flex-direction:column; gap:10px;"></div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <script>
+        // --- CONFIG ---
+        const API_URL = 'http://localhost:3000/api/customers';
+        let allCustomers = [];
+        let filteredCustomers = [];
+        let currentEditingCustomer = null;
+        let currentView = 'grid';
+        const initialSearch = new URLSearchParams(window.location.search).get('search') || new URLSearchParams(window.location.search).get('q');
+
+        // --- HELPER FUNCTIONS ---
+        const formatINR = (amount) => {
+            if(amount >= 10000000) return `₹${(amount/10000000).toFixed(2)} Cr`;
+            if(amount >= 100000) return `₹${(amount/100000).toFixed(2)} L`;
+            return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount);
+        };
+
+        const formatDate = (dateString) => {
+            return new Date(dateString).toLocaleDateString('en-IN', {
+                day: '2-digit', month: 'short', year: 'numeric'
+            });
+        };
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchCustomers();
+            initializeEventListeners();
+        });
+
+        function initializeEventListeners() {
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('input', handleSearch);
+            
+            // Filter pills
+            document.querySelectorAll('.filter-pill').forEach(pill => {
+                pill.addEventListener('click', () => handleFilter(pill.dataset.filter));
+            });
+            
+            // Sort functionality
+            document.getElementById('sortSelect').addEventListener('change', handleSort);
+            
+            // Delete confirmation
+            document.getElementById('deleteConfirmName').addEventListener('input', handleDeleteConfirmation);
+            
+            // Property type change listeners - attach when modal opens
+            const addModal = document.getElementById('addCustomerModal');
+            addModal.addEventListener('shown.bs.modal', () => {
+                document.querySelectorAll('.property-type-checkbox input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.addEventListener('change', handlePropertyTypeChange);
+                });
+            });
+        }
+
+        // --- CONDITIONAL FIELD DISPLAY ---
+        function handlePropertyTypeChange() {
+            setTimeout(() => {
+                const residentialTypes = ['Apartment', 'Villa', 'Penthouse'];
+                const checkboxes = document.querySelectorAll('input[name="propertyTypes"]:checked');
+                const selectedValues = Array.from(checkboxes).map(cb => cb.value);
+                
+                const hasResidential = selectedValues.some(val => residentialTypes.includes(val));
+                const residentialSection = document.getElementById('residentialDetails');
+                
+                // Kill any ongoing animations first
+                gsap.killTweensOf(residentialSection);
+                
+                if (hasResidential) {
+                    // Show the section
+                    if (residentialSection.style.display === 'none') {
+                        residentialSection.style.display = 'block';
+                        residentialSection.style.opacity = '0';
+                        
+                        gsap.to(residentialSection, {
+                            opacity: 1, 
+                            duration: 0.4, 
+                            ease: 'power2.out'
+                        });
+                    }
+                } else {
+                    // Hide the section
+                    if (residentialSection.style.display !== 'none') {
+                        gsap.to(residentialSection, {
+                            opacity: 0, 
+                            duration: 0.3, 
+                            ease: 'power2.in',
+                            onComplete: () => {
+                                residentialSection.style.display = 'none';
+                                // Clear BHK and typology values when hidden
+                                document.querySelector('select[name="bhk"]').value = '';
+                                document.querySelector('select[name="typology"]').value = '';
+                            }
+                        });
+                    }
+                }
+            }, 100);
+        }
+
+        // --- FETCH & RENDER ---
+        async function fetchCustomers() {
+            try {
+                const res = await fetch(API_URL);
+                const raw = await res.json();
+                allCustomers = raw.filter(c => c.status !== 'Closed');
+                filteredCustomers = [...allCustomers];
+                renderCustomers();
+                updateStats();
+                if(initialSearch){
+                    const input = document.getElementById('searchInput');
+                    if(input){
+                        input.value = initialSearch;
+                        handleSearch({ target: { value: initialSearch } });
+                    }
+                }
+            } catch (err) {
+                console.error(err);
+                showError('Failed to load customers');
+            }
+        }
+
+        function toggleCustomerView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-toggle-btn').forEach(btn => {
+                if(btn.dataset.view === view) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            renderCustomers();
+        }
+
+        function renderCustomers() {
+            const container = document.getElementById('leads-container');
+            
+            if (filteredCustomers.length === 0) {
+                container.innerHTML = `
+                    <div class="page-loader">
+                        <div class="text-center">
+                            <i class="fa-solid fa-users text-muted" style="font-size:4rem;"></i>
+                            <h4 class="text-muted mt-3">No customers found</h4>
+                            <p class="text-muted">Try adjusting your search or filters</p>
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            if(currentView === 'grid') {
+                renderGridView();
+            } else {
+                renderListView();
+            }
+        }
+
+        function renderGridView() {
+            const container = document.getElementById('leads-container');
+            
+            // Create grid wrapper
+            const gridHTML = filteredCustomers.map((c, index) => {
+                const initials = c.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                const typesBadges = (c.propertyTypes || []).slice(0,3).map(t => 
+                    `<span class='badge bg-light text-dark border fw-normal' style='font-size:.6rem; letter-spacing:.5px; margin:2px;'>${t}</span>`
+                ).join('');
+                const desc = c.description ? c.description.substring(0,90) + (c.description.length > 90 ? '…' : '') : '';
+                const hasFollowUp = c.notes && c.notes.some(note => note.followUpDate && new Date(note.followUpDate) > new Date());
+                
+                return `
+                <div class="client-card" style="animation-delay:${index * 0.05}s;">
+                    <div class="customer-actions">
+                        <button class="btn-action edit" onclick="openEditModal('${c.custId}')" title="Edit Customer">
+                            <i class="fa-solid fa-edit"></i>
+                        </button>
+                        <button class="btn-action notes" onclick="openNotesModal('${c.custId}')" title="View Notes">
+                            <i class="fa-solid fa-sticky-note"></i>
+                        </button>
+                        <button class="btn-action delete" onclick="openDeleteModal('${c.custId}')" title="Delete Customer">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                        ${c.status !== 'Closed' ? `<button class=\"btn-action\" onclick=\"openCloseDealModal('${c.custId}')\" title=\"Mark Closed\"><i class=\"fa-solid fa-circle-check\"></i></button>` : ''}
+                    </div>
+                    
+                    <div style="padding:24px; padding-bottom:16px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                            <div style="font-size:0.7rem; font-weight:700; letter-spacing:1px; background:var(--primary); color:var(--gold); padding:6px 12px; border-radius:20px;">
+                                ID ${c.custId || '----'}
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                ${hasFollowUp ? '<i class="fa-solid fa-bell text-warning" title="Has follow-up"></i>' : ''}
+                                <span class="badge-status status-${c.status}" style="position:static;">${c.status}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mb-3">
+                            <div class="avatar-circle mx-auto">${initials}</div>
+                            <h4 class="brand-font fw-bold mb-1" style="font-size:1.2rem;">${c.name}</h4>
+                            <p class="text-muted small mb-0" style="font-size:0.8rem;">
+                                <i class="fa-solid fa-phone me-1"></i>${c.phone}
+                                ${c.email ? `<br><i class="fa-solid fa-envelope me-1 text-gold"></i>${c.email}` : ''}
+                            </p>
+                        </div>
+                        
+                        <div class="info-block">
+                            ${c.dealType ? `<div class="info-row">
+                                <span class="info-label">Deal Type</span>
+                                <span class="info-value text-end"><span class="badge" style="background:linear-gradient(135deg, var(--gold), #f4d47b); color:#1a1a1a; font-size:0.7rem; padding:4px 10px;">${c.dealType}</span></span>
+                            </div>` : ''}
+                            <div class="info-row">
+                                <span class="info-label">Requirement</span>
+                                <span class="info-value text-end">${c.req || '-'}</span>
+                            </div>
+                            ${c.typology ? `<div class="info-row">
+                                <span class="info-label">Typology</span>
+                                <span class="info-value text-end">${c.typology}</span>
+                            </div>` : ''}
+                            ${c.bhk ? `<div class="info-row">
+                                <span class="info-label">BHK</span>
+                                <span class="info-value text-end">${c.bhk}</span>
+                            </div>` : ''}
+                            <div class="info-row" style="border:none;">
+                                <span class="info-label">Budget</span>
+                                <span class="info-value text-end text-gold">${formatINR(c.budget || 0)}</span>
+                            </div>
+                            ${desc ? `<div class='mt-2' style='font-size:.75rem; line-height:1.4; background:#f8f9fa; padding:12px; border-radius:10px; min-height:52px; color:#666;'>${desc}</div>` : ''}
+                            ${typesBadges ? `<div class='mt-2 d-flex flex-wrap gap-1'>${typesBadges}</div>` : ''}
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+
+            container.innerHTML = `<div class="customers-grid">${gridHTML}</div>`;
+
+            // Stabilize animations to prevent cumulative fading on re-renders
+            const selector = '.client-card';
+            gsap.killTweensOf(selector);
+            gsap.set(selector, { opacity: 1, y: 0 });
+            gsap.fromTo(selector,
+                { opacity: 0, y: 30 },
+                { opacity: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'back.out(1.5)', clearProps: 'opacity,transform' }
+            );
+        }
+
+        function renderListView() {
+            const container = document.getElementById('leads-container');
+            
+            const rows = filteredCustomers.map(c => {
+                const initials = c.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                const budget = c.budget ? formatINR(c.budget) : 'N/A';
+                const typology = c.typology ? c.typology : '—';
+                const dealType = c.dealType ? c.dealType : '—';
+                const hasFollowUp = c.notes && c.notes.some(note => note.followUpDate && new Date(note.followUpDate) > new Date());
+                
+                return `
+                <tr class="align-middle">
+                    <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="avatar-circle" style="width:42px; height:42px; margin-bottom:0; font-size:1rem;">${initials}</div>
+                            <div>
+                                <h6 class="mb-1 fw-bold text-dark">${c.name}</h6>
+                                <small class="text-muted">ID: ${c.custId || '—'}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="small">${c.phone}</div>
+                        ${c.email ? `<div class="text-muted small">${c.email}</div>` : ''}
+                    </td>
+                    <td><span class="badge bg-light text-dark px-3 py-2">${dealType}</span></td>
+                    <td><span class="badge bg-light text-dark px-3 py-2">${typology}</span></td>
+                    <td class="brand-font fw-bold">${budget}</td>
+                    <td><span class="badge-status status-${c.status}">${c.status}</span></td>
+                    <td class="text-end">
+                        <button class="btn-action edit" title="Edit" onclick="openEditModal('${c.custId}')"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-action notes" title="Notes" onclick="openNotesModal('${c.custId}')"><i class="fa-solid fa-sticky-note"></i></button>
+                        <button class="btn-action delete" title="Delete" onclick="openDeleteModal('${c.custId}')"><i class="fa-solid fa-trash"></i></button>
+                        ${c.status !== 'Closed' ? `<button class="btn-action" title="Close" onclick="openCloseDealModal('${c.custId}')" style="border-color:var(--gold); color:var(--gold);"><i class="fa-solid fa-circle-check"></i></button>` : ''}
+                    </td>
+                </tr>
+                `;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="customers-table">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">Customer</th>
+                                <th style="width: 20%;">Contact</th>
+                                <th style="width: 12%;">Deal Type</th>
+                                <th style="width: 12%;">Typology</th>
+                                <th style="width: 12%;">Budget</th>
+                                <th style="width: 12%;">Status</th>
+                                <th class="text-end" style="width: 7%;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rows}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function updateStats() {
+            document.getElementById('stat-total').innerText = allCustomers.length;
+            const interested = allCustomers.filter(c => c.status === 'Interested').length;
+            document.getElementById('stat-intent').innerText = interested;
+            const value = allCustomers.reduce((acc, curr) => acc + (curr.budget || 0), 0);
+            document.getElementById('stat-value').innerText = formatINR(value);
+        }
+
+        // --- SEARCH & FILTER ---
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase();
+            filteredCustomers = allCustomers.filter(c => 
+                (c.custId && c.custId.toString().toLowerCase().includes(query)) ||
+                c.name.toLowerCase().includes(query) ||
+                c.phone.includes(query) ||
+                (c.email && c.email.toLowerCase().includes(query)) ||
+                (c.req && c.req.toLowerCase().includes(query))
+            );
+            renderCustomers();
+        }
+
+        function handleFilter(filter) {
+            // Update active filter pill
+            document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+            document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+            
+            if (filter === 'all') {
+                filteredCustomers = [...allCustomers];
+            } else {
+                filteredCustomers = allCustomers.filter(c => c.status === filter);
+            }
+            renderCustomers();
+        }
+
+        function handleSort() {
+            const sortBy = document.getElementById('sortSelect').value;
+            
+            filteredCustomers.sort((a, b) => {
+                switch(sortBy) {
+                    case 'name': return a.name.localeCompare(b.name);
+                    case 'name-desc': return b.name.localeCompare(a.name);
+                    case 'budget': return (b.budget || 0) - (a.budget || 0);
+                    case 'budget-asc': return (a.budget || 0) - (b.budget || 0);
+                    case 'recent': return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+                    default: return 0;
+                }
+            });
+            renderCustomers();
+        }
+
+        // --- CUSTOMER MANAGEMENT ---
+        async function handleAddCustomer(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Collect property types from checkboxes
+            const selectedTypes = Array.from(e.target.querySelectorAll('input[name="propertyTypes"]:checked'))
+                .map(cb => cb.value);
+            data.propertyTypes = selectedTypes;
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await res.json();
+                if(!res.ok) {
+                    showError(result.message || 'Error creating customer');
+                    return;
+                }
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('addCustomerModal'));
+                modal.hide();
+                e.target.reset();
+                
+                await fetchCustomers();
+                showSuccess(`Customer profile created successfully! ID: ${result.custId || result.data?.custId}`);
+                
+            } catch(err) {
+                console.error(err);
+                showError('Network error occurred');
+            }
+        }
+
+        async function openEditModal(customerId) {
+            const customer = allCustomers.find(c => c.custId === customerId);
+            if (!customer) return;
+            
+            currentEditingCustomer = customer;
+            
+            // Populate form fields
+            document.getElementById('editCustomerId').value = customerId;
+            document.getElementById('editName').value = customer.name || '';
+            document.getElementById('editEmail').value = customer.email || '';
+            document.getElementById('editPhone').value = customer.phone || '';
+            document.getElementById('editBudget').value = customer.budget || '';
+            document.getElementById('editReq').value = customer.req || '';
+            document.getElementById('editDescription').value = customer.description || '';
+            document.getElementById('editBhk').value = customer.bhk || '';
+            document.getElementById('editTypology').value = customer.typology || '';
+            document.getElementById('editStatus').value = customer.status || 'New';
+            
+            const modal = new bootstrap.Modal(document.getElementById('editCustomerModal'));
+            modal.show();
+        }
+
+        async function handleEditCustomer(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            const customerId = data.customerId;
+            delete data.customerId;
+
+            try {
+                const res = await fetch(`${API_URL}/${customerId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if(!res.ok) {
+                    const error = await res.json();
+                    showError(error.message || 'Error updating customer');
+                    return;
+                }
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editCustomerModal'));
+                modal.hide();
+                
+                await fetchCustomers();
+                showSuccess('Customer profile updated successfully!');
+                
+            } catch(err) {
+                console.error(err);
+                showError('Network error occurred');
+            }
+        }
+
+        function openCloseDealModal(custId){
+            const customer = allCustomers.find(c=>c.custId===custId);
+            if(!customer) return;
+            document.getElementById('closeDealCustomerId').value = custId;
+            document.getElementById('closeDealCustomerName').textContent = customer.name + ' (ID ' + customer.custId + ')';
+            const modal = new bootstrap.Modal(document.getElementById('closeDealModal'));
+            modal.show();
+        }
+
+        async function handleCloseDeal(e){
+            e.preventDefault();
+            const form = e.target;
+            const custId = form.closeDealCustomerId.value;
+            const propertyTitle = form.propertyTitle.value.trim();
+            const propertyPrice = form.propertyPrice.value.trim();
+            const propertyLocation = form.propertyLocation.value.trim();
+            const propertyTypology = form.propertyTypology.value.trim();
+            const propertySegment = form.propertySegment.value.trim();
+            const propertyBhk = form.propertyBhk.value.trim();
+            const propertySize = form.propertySize.value.trim();
+            const propertyCommission = form.propertyCommission.value.trim();
+            const propertySource = form.propertySource.value.trim();
+            try {
+                const res = await fetch(`${API_URL}/${custId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: 'Closed' })
+                });
+                const json = await res.json();
+                if(!res.ok){ showError(json.message || 'Failed to mark closed'); return; }
+                // Create property asset if any details provided
+                const anyPropertyInfo = propertyTitle || propertyLocation || propertyPrice || propertyTypology || propertySegment || propertyBhk || propertySize || propertyCommission || propertySource;
+                if(anyPropertyInfo){
+                    // Persist property record so Directory can show asset
+                    try {
+                        await fetch('http://localhost:3000/api/properties', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                title: propertyTitle || 'Closed Property',
+                                location: propertyLocation || '',
+                                price: propertyPrice ? Number(propertyPrice) : undefined,
+                                customerCustId: custId,
+                                closedDate: new Date().toISOString()
+                                , typology: propertyTypology || undefined
+                                , segment: propertySegment || undefined
+                                , bhk: propertyBhk || undefined
+                                , sizeSqFt: propertySize ? Number(propertySize) : undefined
+                                , commission: propertyCommission ? Number(propertyCommission) : undefined
+                                , sourceChannel: propertySource || undefined
+                            })
+                        });
+                    } catch(propErr){ console.warn('Property creation failed', propErr); }
+                    // Add closure note summary
+                    const summary = `Closed deal: ${propertyTitle || 'Property'}${propertyLocation?` | ${propertyLocation}`:''}${propertyPrice?` | Price: ₹${propertyPrice}`:''}${propertyTypology?` | Typology: ${propertyTypology}`:''}${propertySegment?` | Segment: ${propertySegment}`:''}${propertyBhk?` | ${propertyBhk}`:''}${propertySize?` | ${propertySize} SqFt`:''}${propertyCommission?` | Commission: ₹${propertyCommission}`:''}`;
+                    try {
+                        await fetch(`${API_URL}/${custId}/notes`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text: summary, type: 'general' })
+                        });
+                    } catch(noteErr){ console.warn('Closure note failed', noteErr); }
+                }
+                showSuccess('Deal closed and moved to Directory');
+                const modal = bootstrap.Modal.getInstance(document.getElementById('closeDealModal'));
+                modal.hide();
+                form.reset();
+                await fetchCustomers();
+            } catch(err){ showError('Network error closing deal'); }
+        }
+
+        function openDeleteModal(customerId) {
+            const customer = allCustomers.find(c => c.custId === customerId);
+            if (!customer) return;
+            
+            document.getElementById('deleteCustomerId').value = customerId;
+            document.getElementById('deleteCustomerName').textContent = customer.name;
+            document.getElementById('deleteConfirmName').value = '';
+            document.getElementById('deleteConfirmBtn').disabled = true;
+            
+            const modal = new bootstrap.Modal(document.getElementById('deleteCustomerModal'));
+            modal.show();
+        }
+
+        function handleDeleteConfirmation(e) {
+            const customerId = document.getElementById('deleteCustomerId').value;
+            const customer = allCustomers.find(c => c.custId === customerId);
+            const typedName = e.target.value.trim();
+            const confirmBtn = document.getElementById('deleteConfirmBtn');
+            
+            if (typedName === customer.name) {
+                confirmBtn.disabled = false;
+                confirmBtn.classList.remove('btn-danger');
+                confirmBtn.classList.add('btn-outline-danger');
+            } else {
+                confirmBtn.disabled = true;
+                confirmBtn.classList.remove('btn-outline-danger');
+                confirmBtn.classList.add('btn-danger');
+            }
+        }
+
+        async function handleDeleteCustomer(e) {
+            e.preventDefault();
+            const customerId = document.getElementById('deleteCustomerId').value;
+
+            try {
+                const res = await fetch(`${API_URL}/${customerId}`, {
+                    method: 'DELETE'
+                });
+                
+                if(!res.ok) {
+                    const error = await res.json();
+                    showError(error.message || 'Error deleting customer');
+                    return;
+                }
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('deleteCustomerModal'));
+                modal.hide();
+                
+                await fetchCustomers();
+                showSuccess('Customer deleted successfully');
+                
+            } catch(err) {
+                console.error(err);
+                showError('Network error occurred');
+            }
+        }
+
+        // --- NOTES MANAGEMENT ---
+        function openNotesModal(customerId) {
+            const customer = allCustomers.find(c => c.custId === customerId);
+            if (!customer) return;
+            
+            document.getElementById('notesCustomerId').value = customerId;
+            document.getElementById('notesCustomerName').textContent = `${customer.name} - Notes & Follow-ups`;
+            
+            loadNotes(customerId);
+            
+            const modal = new bootstrap.Modal(document.getElementById('notesModal'));
+            modal.show();
+        }
+
+        async function loadNotes(customerId) {
+            try {
+                const res = await fetch(`${API_URL}/${customerId}/notes`);
+                const result = await res.json();
+                if(res.ok && result.success) {
+                    const notes = result.data || [];
+                    renderNotes(notes);
+                    renderUpcomingFollowUps(notes);
+                } else {
+                    document.getElementById('notesHistory').innerHTML = '<p class="text-muted">No notes data available.</p>';
+                }
+            } catch(err) {
+                document.getElementById('notesHistory').innerHTML = '<p class="text-muted">Notes loading failed.</p>';
+            }
+        }
+
+        function renderNotes(notes) {
+            const container = document.getElementById('notesHistory');
+            if (!notes || notes.length === 0) {
+                container.innerHTML = '<p class="text-muted">No notes added yet.</p>';
+                return;
+            }
+            
+            container.innerHTML = notes.map(note => `
+                <div class="note-item ${note.type}">
+                    <div class="note-meta">
+                        <div>
+                            <span class="note-type-badge">${note.type}</span>
+                            <span class="ms-2">${formatDate(note.createdAt)}</span>
+                        </div>
+                        ${note.followUpDate ? `<span class="text-warning"><i class="fa-solid fa-calendar me-1"></i>${formatDate(note.followUpDate)}</span>` : ''}
+                    </div>
+                    <div class="note-content">${note.text}</div>
+                </div>
+            `).join('');
+        }
+
+        function renderUpcomingFollowUps(notes) {
+            const container = document.getElementById('upcomingFollowUps');
+            const upcoming = notes.filter(note => note.followUpDate && new Date(note.followUpDate) > new Date())
+                .sort((a, b) => new Date(a.followUpDate) - new Date(b.followUpDate));
+            
+            if (upcoming.length === 0) {
+                container.innerHTML = '<p class="text-muted">No upcoming follow-ups</p>';
+                return;
+            }
+            
+            container.innerHTML = upcoming.map(note => `
+                <div class="small mb-2 p-2 bg-light rounded">
+                    <div class="fw-bold text-warning">${formatDate(note.followUpDate)}</div>
+                    <div class="text-muted">${note.text.substring(0, 50)}...</div>
+                </div>
+            `).join('');
+        }
+
+        async function handleAddNote(e) {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const customerId = formData.get('customerId');
+            const text = formData.get('noteText').trim();
+            const type = formData.get('noteType') || 'general';
+            const followUpDate = formData.get('followUpDate');
+            if(!text){
+                showError('Note text is required');
+                return;
+            }
+            try {
+                const res = await fetch(`${API_URL}/${customerId}/notes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, type, followUpDate: followUpDate || undefined })
+                });
+                const result = await res.json();
+                if(!res.ok || !result.success){
+                    showError(result.message || 'Failed to add note');
+                    return;
+                }
+                showSuccess('Note added successfully');
+                e.target.reset();
+                // Refresh notes & customer list for follow-up badge
+                await loadNotes(customerId);
+                // Update in-memory customer notes (optional for bell icon without full refetch)
+                const customer = allCustomers.find(c => c.custId === customerId);
+                if(customer){
+                    customer.notes = customer.notes || [];
+                    customer.notes.push(result.data);
+                    renderCustomers();
+                } else {
+                    // Fallback: refetch all customers if not found
+                    fetchCustomers();
+                }
+            } catch(err){
+                showError('Network error adding note');
+            }
+        }
+
+        // --- UTILITY FUNCTIONS ---
+        function showSuccess(message) {
+            showToast(message, 'success');
+        }
+
+        function showError(message) {
+            showToast(message, 'error');
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toastId = 'toast-' + Date.now();
+            
+            const icons = {
+                success: 'fa-circle-check',
+                error: 'fa-circle-xmark',
+                info: 'fa-circle-info'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `app-toast ${type}`;
+            toast.id = toastId;
+            toast.innerHTML = `
+                <i class="fa-solid ${icons[type]}"></i>
+                <span>${message}</span>
+                <button class="toast-close" onclick="document.getElementById('${toastId}').remove()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 4000);
+        }
+
+        // Removed simulated report generation
+    </script>
+</body>
+</html>

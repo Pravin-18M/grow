@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grwo | Growth Relationship Workflow Operations</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* LUXURY THEME VARIABLES */
+        :root {
+            --primary: #1a1a1a;
+            --gold: #d4af37;
+            --bg: #f8f9fa;
+            --glass: rgba(255, 255, 255, 0.95);
+            --transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .brand-font { font-family: 'Playfair Display', serif; }
+        .text-gold { color: var(--gold) !important; }
+        
+        /* UI COMPONENTS */
+        .btn-premium {
+            background: var(--primary); color: #fff; padding: 12px 30px;
+            border-radius: 50px; border: none; font-weight: 600;
+            transition: var(--transition);
+        }
+        .btn-premium:hover {
+            background: var(--gold); transform: translateY(-2px); color: #fff;
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Removed preloader styles */
+
+        /* HERO SECTION */
+        .hero-section {
+            height: 100vh; width: 100%; position: relative;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .video-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            object-fit: cover; z-index: -1; filter: brightness(0.5);
+        }
+        .hero-content { text-align: center; color: #fff; z-index: 2; max-width: 800px; }
+        .hero-title { font-size: 5rem; margin-bottom: 1rem; line-height: 1.1; font-family: 'Playfair Display'; opacity: 0; }
+        .hero-tagline { font-size: 1.5rem; font-weight: 300; opacity: 0; color: rgba(255,255,255,0.9); }
+
+        /* BRAND SECTIONS */
+        .section-brand { padding: 100px 0; background: #fff; }
+        .feature-card {
+            padding: 40px; border-radius: 20px; background: #fff;
+            border: 1px solid #f0f0f0; transition: var(--transition); height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px); box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            border-color: var(--gold);
+        }
+        .feature-icon { font-size: 2.5rem; color: var(--gold); margin-bottom: 20px; }
+
+        /* AUTH MODAL SYSTEM */
+        .auth-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(10px);
+            z-index: 1000; display: none; align-items: center; justify-content: center;
+        }
+        .auth-box {
+            width: 100%; max-width: 450px; padding: 40px;
+            background: var(--glass); border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
+            opacity: 0; transform: scale(0.9);
+        }
+        .form-control:focus { box-shadow: none; border-color: var(--gold); }
+        .form-floating label { font-size: 0.9rem; color: #666; }
+
+        /* SUCCESS OVERLAY */
+        .success-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; z-index:2000; }
+        .success-box { text-align:center; padding:60px 50px; border:2px solid var(--gold); border-radius:32px; background:linear-gradient(145deg,#121212,#1e1e1e); color:#fff; width:90%; max-width:520px; box-shadow:0 30px 70px rgba(0,0,0,0.6); opacity:0; transform:translateY(30px); position:relative; overflow:hidden; }
+        .success-icon { font-size:4.5rem; color:var(--gold); filter:drop-shadow(0 0 12px rgba(212,175,55,0.4)); opacity:0; }
+        .success-glow { position:absolute; inset:0; background:radial-gradient(circle at 50% 50%, rgba(212,175,55,0.25), transparent 60%); mix-blend-mode:overlay; animation:pulseGlow 4s infinite ease-in-out; }
+        @keyframes pulseGlow { 0%,100% { opacity:.4 } 50% { opacity:.9 } }
+        .success-progress { height:6px; width:0; background:var(--gold); border-radius:6px; margin-top:35px; box-shadow:0 0 10px rgba(212,175,55,0.7); }
+        .success-heading { font-family:'Playfair Display',serif; font-size:2.2rem; margin:25px 0 10px; letter-spacing:.5px; }
+        .success-sub { font-size:1rem; color:#ddd; }
+        .success-meta { font-size:.75rem; text-transform:uppercase; letter-spacing:2px; color:var(--gold); margin-top:18px; }
+    </style>
+</head>
+<body>
+
+    <!-- Preloader removed -->
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg fixed-top navbar-dark" style="background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); padding: 20px 0;">
+        <div class="container">
+            <a class="navbar-brand brand-font fs-3" href="#">Grwo<span class="text-gold">.</span></a>
+            <button class="btn btn-light btn-sm rounded-pill px-4 fw-bold" onclick="showAuth('login')">Login Portal</button>
+        </div>
+    </nav>
+
+    <!-- HERO -->
+    <section class="hero-section">
+        <video class="video-bg" autoplay loop muted playsinline poster="https://images.unsplash.com/photo-1600596542815-27bfefd02379?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80">
+            <source src="prop.mp4" type="video/mp4">
+        </video>
+        
+        <div class="hero-content">
+            <h1 class="hero-title">Growth Relationship Workflow Operations</h1>
+            <p class="hero-tagline">The ultra-premium CRM for the top 1% of Real Estate.</p>
+            <div class="d-flex gap-3 justify-content-center mt-4" style="opacity: 0; transform: translateY(20px);" id="hero-cta">
+                <button class="btn btn-premium" onclick="showAuth('register')">Get Started</button>
+                <button class="btn btn-outline-light rounded-pill px-4" onclick="document.getElementById('brand-info').scrollIntoView({behavior:'smooth'})">Discover More</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- BRAND INFO -->
+    <section id="brand-info" class="section-brand">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Architecture" class="img-fluid rounded-4 shadow-lg reveal-img">
+                </div>
+                <div class="col-lg-6 ps-lg-5">
+                    <h6 class="text-gold text-uppercase letter-spacing-2 mb-3">The Grwo Standard</h6>
+                    <h2 class="display-5 mb-4 brand-font reveal-text">We engineer empires.</h2>
+                    <p class="text-muted fs-5 mb-4 reveal-text">Built by veterans of the trade for the visionaries of tomorrow. Our algorithms connect interest with inventory instantly.</p>
+                    <div class="row g-4 reveal-text">
+                        <div class="col-6">
+                            <h3 class="display-6 fw-bold">100B+</h3>
+                            <p class="text-muted">Assets Managed (INR)</p>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="display-6 fw-bold">98%</h3>
+                            <p class="text-muted">Lead Conversion</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section-brand bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h6 class="text-gold text-uppercase">Why Grwo?</h6>
+                <h2 class="display-5 brand-font">State of the Art Ecosystem</h2>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="fa-solid fa-building-columns feature-icon"></i>
+                        <h4>Property Command</h4>
+                        <p class="text-muted">Manage Apartments, Commercial, and Estates with granular detail.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="fa-solid fa-users-viewfinder feature-icon"></i>
+                        <h4>Lead Intelligence</h4>
+                        <p class="text-muted">AI-driven matching of requirements to your inventory automatically.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <i class="fa-solid fa-chart-pie feature-icon"></i>
+                        <h4>Hyper-Analytics</h4>
+                        <p class="text-muted">Generate exclusive PDF reports with cinematic data visualization.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AUTH MODAL SYSTEM -->
+    <div class="auth-overlay" id="authModal">
+        <div class="auth-box">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0 brand-font" id="authTitle">Login</h3>
+                <button class="btn-close" onclick="closeAuth()"></button>
+            </div>
+
+            <!-- 1. LOGIN -->
+            <div id="loginView">
+                <form onsubmit="handleAuth(event, 'login')">
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" name="email" placeholder="Email" required>
+                        <label>Email address</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="password" class="form-control" name="password" placeholder="Password" required>
+                        <label>Password</label>
+                    </div>
+                    <div class="text-end mb-4">
+                        <a href="#" class="text-muted text-decoration-none small" onclick="switchView('forgot')">Forgot Password?</a>
+                    </div>
+                    <button type="submit" class="btn btn-premium w-100 py-3">Access Portal</button>
+                </form>
+                <p class="text-center mt-3 text-muted">Don't have an account? <a href="#" class="text-gold text-decoration-none" onclick="switchView('register')">Register</a></p>
+            </div>
+
+            <!-- 2. REGISTER -->
+            <div id="registerView" style="display:none;">
+                <form onsubmit="handleAuth(event, 'register')">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" name="fullName" placeholder="Full Name" required>
+                        <label>Full Name</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" name="firmName" placeholder="Firm Name" required>
+                        <label>Firm Name</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" name="email" placeholder="Email" required>
+                        <label>Email address</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="regPass" name="password" placeholder="Password" required>
+                        <label>Password</label>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input type="password" class="form-control" id="regConfirm" placeholder="Confirm Password" required>
+                        <label>Confirm Password</label>
+                    </div>
+                    <button type="submit" class="btn btn-premium w-100 py-3">Create Account</button>
+                </form>
+                <p class="text-center mt-3 text-muted">Already have an account? <a href="#" class="text-gold text-decoration-none" onclick="switchView('login')">Login</a></p>
+            </div>
+
+            <!-- 3. FORGOT PASSWORD -->
+            <div id="forgotView" style="display:none;">
+                <p class="text-muted mb-4">Enter your email to receive a reset link.</p>
+                <form onsubmit="handleAuth(event, 'forgot')">
+                    <div class="form-floating mb-4">
+                        <input type="email" class="form-control" name="email" placeholder="Email" required>
+                        <label>Email address</label>
+                    </div>
+                    <button type="submit" class="btn btn-premium w-100 py-3">Send Link</button>
+                </form>
+                <div class="text-center mt-3">
+                    <a href="#" class="text-muted text-decoration-none" onclick="switchView('login')">Back to Login</a>
+                </div>
+            </div>
+
+            <!-- 4. RESET PASSWORD -->
+            <div id="resetView" style="display:none;">
+                <div class="alert alert-success small">Email Verified. Set new password.</div>
+                <form onsubmit="handleAuth(event, 'reset')">
+                    <input type="hidden" name="email" id="resetEmail">
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="newPass" name="password" placeholder="New Password" required>
+                        <label>New Password</label>
+                    </div>
+                    <div class="form-floating mb-4">
+                        <input type="password" class="form-control" id="newConfirm" placeholder="Confirm" required>
+                        <label>Confirm New Password</label>
+                    </div>
+                    <button type="submit" class="btn btn-premium w-100 py-3">Update Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUCCESS OVERLAY -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-box" id="successBox">
+            <div class="success-glow"></div>
+            <div class="success-icon" id="successIcon">✔</div>
+            <div class="success-heading" id="successHeading">Success</div>
+            <div class="success-sub" id="successSub">Authentication complete.</div>
+            <div class="success-progress" id="successProgress"></div>
+            <div class="success-meta" id="successMeta">GRWO SECURE CHANNEL</div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <script>
+        // --- ANIMATIONS ---
+        gsap.registerPlugin(ScrollTrigger);
+        const tl = gsap.timeline();
+                tl.to(".hero-title", { opacity: 1, y: 0, duration: 1 })
+          .to(".hero-tagline", { opacity: 1, y: 0, duration: 1 }, "-=0.8")
+          .to("#hero-cta", { opacity: 1, y: 0, duration: 1 }, "-=0.8");
+
+        gsap.utils.toArray('.reveal-text').forEach(elem => {
+            gsap.from(elem, {
+                scrollTrigger: { trigger: elem, start: "top 80%" },
+                y: 50, opacity: 0, duration: 1, ease: "power3.out"
+            });
+        });
+
+        // --- AUTH LOGIC ---
+        function showAuth(view) {
+            document.getElementById('authModal').style.display = 'flex';
+            gsap.to(".auth-box", { opacity: 1, scale: 1, duration: 0.4 });
+            switchView(view);
+        }
+
+        function closeAuth() {
+            gsap.to(".auth-box", { opacity: 0, scale: 0.9, duration: 0.3, onComplete: () => {
+                document.getElementById('authModal').style.display = 'none';
+            }});
+        }
+
+        function switchView(view) {
+            ['login', 'register', 'forgot', 'reset'].forEach(v => {
+                document.getElementById(v + 'View').style.display = 'none';
+            });
+            document.getElementById(view + 'View').style.display = 'block';
+            
+            const titles = { login: 'Login', register: 'Register Firm', forgot: 'Recovery', reset: 'Reset Password' };
+            document.getElementById('authTitle').innerText = titles[view];
+            gsap.from("#" + view + "View", { opacity: 0, y: 10, duration: 0.3 });
+        }
+
+        async function handleAuth(e, type) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            // Client-side Validations
+            if(type === 'register') {
+                if(document.getElementById('regPass').value !== document.getElementById('regConfirm').value) {
+                    alert("Passwords do not match."); return;
+                }
+            }
+            if(type === 'reset') {
+                if(document.getElementById('newPass').value !== document.getElementById('newConfirm').value) {
+                    alert("Passwords do not match."); return;
+                }
+            }
+
+            try {
+                const res = await fetch(`/api/${type}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+
+                if(result.success) {
+                    if(type === 'login' && result.user) {
+                        localStorage.setItem('user', JSON.stringify(result.user));
+                        showSuccess('Access Granted', 'Secure session established', '/dashboard.html');
+                    } else if(type === 'register' && result.user) {
+                        localStorage.setItem('user', JSON.stringify(result.user));
+                        showSuccess('Firm Registered', 'Provisioning workspace...', '/dashboard.html');
+                    } else if(type === 'forgot') {
+                        showSuccess('Reset Link Sent', 'Check your inbox to proceed');
+                        document.getElementById('resetEmail').value = data.email;
+                        setTimeout(()=>switchView('reset'), 1500);
+                    } else if(type === 'reset') {
+                        showSuccess('Password Updated', 'Please login with new credentials');
+                        setTimeout(()=>switchView('login'), 1500);
+                    }
+                } else {
+                    alert(result.message || 'An error occurred');
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Server connection failed");
+            }
+        }
+
+        // SUCCESS EFFECT
+        function showSuccess(title, subtitle, redirectUrl) {
+            const overlay = document.getElementById('successOverlay');
+            const box = document.getElementById('successBox');
+            const icon = document.getElementById('successIcon');
+            const heading = document.getElementById('successHeading');
+            const sub = document.getElementById('successSub');
+            const progress = document.getElementById('successProgress');
+            overlay.style.display = 'flex';
+            heading.textContent = title || 'Success';
+            sub.textContent = subtitle || '';
+            progress.style.width = '0';
+
+            gsap.timeline()
+                .set([box, icon], { opacity:0 })
+                .to(box, { opacity:1, y:0, duration:0.6, ease:'power3.out' })
+                .to(icon, { opacity:1, scale:1.05, duration:0.6, ease:'elastic.out(1,0.6)' }, '-=0.3')
+                .to(progress, { width:'100%', duration:2.3, ease:'power1.inOut' }, '-=0.2');
+
+            if(redirectUrl) {
+                setTimeout(()=> {
+                    window.location.href = redirectUrl;
+                }, 2400);
+            } else {
+                setTimeout(()=> {
+                    hideSuccess();
+                }, 2400);
+            }
+        }
+
+        function hideSuccess() {
+            gsap.to('#successBox', { opacity:0, duration:0.4, onComplete:()=> {
+                document.getElementById('successOverlay').style.display = 'none';
+            }});
+        }
+    </script>
+</body>
+</html>
